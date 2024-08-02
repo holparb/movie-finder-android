@@ -89,9 +89,12 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // Retrofit
+    // Retrofit with Moshi
     implementation (libs.retrofit)
     implementation (libs.converter.moshi)
     implementation (libs.logging.interceptor)
     ksp(libs.moshi.codegen)
+
+    // Image caching with Coil
+    implementation(libs.coil.compose)
 }

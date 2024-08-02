@@ -11,7 +11,7 @@ val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.W400,
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         color = PrimaryText
     ),
     bodyMedium = TextStyle(
@@ -27,7 +27,7 @@ val Typography = Typography(
     ),
     titleLarge = TextStyle(
         fontWeight = FontWeight.Bold,
-        fontSize = 22.sp,
+        fontSize = 24.sp,
         color = SecondaryText
     ),
     titleMedium = TextStyle(

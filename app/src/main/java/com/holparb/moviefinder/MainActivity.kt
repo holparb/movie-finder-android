@@ -8,7 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.holparb.moviefinder.movies.presentation.events.HomeEvent
-import com.holparb.moviefinder.movies.presentation.pages.MainScreen
+import com.holparb.moviefinder.movies.presentation.pages.HomeScreen
 import com.holparb.moviefinder.movies.presentation.viewmodels.PopularMoviesViewModel
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,12 +21,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        viewModel.onEvent(HomeEvent.LoadPopularMovies)
         setContent {
             MovieFinderTheme {
+
                 val popularMoviesState by viewModel.popularMoviesState.collectAsStateWithLifecycle()
                 val mainItemState by viewModel.mainItemState.collectAsStateWithLifecycle()
-                viewModel.onEvent(HomeEvent.LoadPopularMovies)
-                MainScreen(
+
+                HomeScreen(
                     popularMoviesState = popularMoviesState,
                     mainItemState = mainItemState
                 )

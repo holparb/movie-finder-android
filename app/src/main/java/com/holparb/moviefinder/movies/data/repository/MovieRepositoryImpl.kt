@@ -1,6 +1,7 @@
 package com.holparb.moviefinder.movies.data.repository
 
 import android.util.Log
+import com.holparb.moviefinder.BuildConfig
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
@@ -13,7 +14,7 @@ class MovieRepositoryImpl @Inject constructor (private val api: TmdbApi): MovieR
     override suspend fun getPopularMovies(page: Int, region: String): Resource<List<MovieListItem>, MovieError.NetworkError> {
         return try {
             Resource.Success(
-                api.getPopularMovies().results.map { movieListItemDto ->
+                api.getPopularMovies(authHeader = "Bearer ${BuildConfig.API_ACCESS_TOKEN}").results.map { movieListItemDto ->
                     movieListItemDto.toMovieListItem()
                 }
             )

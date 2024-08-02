@@ -1,10 +1,11 @@
 package com.holparb.moviefinder.movies.domain.model
 
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 data class MovieListItem(
     val id: Int,
     val title: String,
-    val releaseDate: LocalDateTime?,
-    val posterPath: String?
+    val releaseDate: LocalDate?,
+    val posterPath: String?,
+    val backdropPath: String?
 )

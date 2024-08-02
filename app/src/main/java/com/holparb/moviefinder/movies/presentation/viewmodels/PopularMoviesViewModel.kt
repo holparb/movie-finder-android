@@ -6,6 +6,7 @@ import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.Resource
 import com.holparb.moviefinder.movies.presentation.events.HomeEvent
 import com.holparb.moviefinder.movies.presentation.states.MainItemState
+import com.holparb.moviefinder.movies.presentation.states.MainItemStatus
 import com.holparb.moviefinder.movies.presentation.states.MovieListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,12 +27,22 @@ class PopularMoviesViewModel @Inject constructor(
     val popularMoviesState = _popularMoviesState.asStateFlow()
 
     val mainItemState = _popularMoviesState.map { popularMoviesState ->
-        MainItemState(
-            loading = popularMoviesState.loading,
-            error = popularMoviesState.errorMessage == null,
+        val mainItemSate = MainItemState(
+            status = resolveMainItemState(popularMoviesState),
             mainItem = if (popularMoviesState.movies.isNotEmpty()) popularMoviesState.movies.first() else null
         )
+        mainItemSate
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MainItemState())
+
+    private fun resolveMainItemState(popularMoviesState: MovieListState): MainItemStatus {
+        if(popularMoviesState.loading) {
+            return MainItemStatus.Loading
+        }
+        if(popularMoviesState.errorMessage.isNullOrEmpty() && popularMoviesState.movies.isNotEmpty()) {
+            return MainItemStatus.Loaded
+        }
+        return MainItemStatus.Error
+    }
 
     fun onEvent(event: HomeEvent) {
         when(event) {
