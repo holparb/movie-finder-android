@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.Resource
-import com.holparb.moviefinder.movies.presentation.events.HomeEvent
+import com.holparb.moviefinder.movies.presentation.events.PopularMoviesEvent
 import com.holparb.moviefinder.movies.presentation.states.MainItemState
 import com.holparb.moviefinder.movies.presentation.states.MainItemStatus
 import com.holparb.moviefinder.movies.presentation.states.MovieListState
@@ -44,9 +44,9 @@ class PopularMoviesViewModel @Inject constructor(
         return MainItemStatus.Error
     }
 
-    fun onEvent(event: HomeEvent) {
+    fun onEvent(event: PopularMoviesEvent) {
         when(event) {
-            HomeEvent.LoadPopularMovies -> {
+            PopularMoviesEvent.LoadPopularMovies -> {
                 viewModelScope.launch {
                     _popularMoviesState.update {
                         it.copy(

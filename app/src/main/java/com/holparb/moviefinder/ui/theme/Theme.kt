@@ -19,6 +19,7 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = PrimaryText,
     onSecondary = SecondaryText,
     surface = PrimaryBackground,
+    onSurface = PrimaryText,
     primaryContainer = PrimaryBackground,
     secondaryContainer = SecondaryBackground
 )

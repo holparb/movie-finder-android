@@ -2,7 +2,6 @@ package com.holparb.moviefinder.movies.presentation.components.horizontal_list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,8 +19,7 @@ import com.holparb.moviefinder.movies.domain.model.MovieListItem
 fun MovieHorizontalList(
     movies: List<MovieListItem>,
     title: String,
-    paddingValues: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -31,7 +29,6 @@ fun MovieHorizontalList(
         )
         Spacer(modifier = Modifier.height(12.dp))
         LazyRow(
-            contentPadding = paddingValues,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             items(movies) { item ->
@@ -49,5 +46,5 @@ fun MovieHorizontalList(
 @Preview
 @Composable
 private fun MovieHorizontalListPreview() {
-    MovieHorizontalList(movies = emptyList(), modifier = Modifier.height(250.dp), title = "Title", paddingValues = PaddingValues())
+    MovieHorizontalList(movies = emptyList(), modifier = Modifier.height(250.dp), title = "Title")
 }
