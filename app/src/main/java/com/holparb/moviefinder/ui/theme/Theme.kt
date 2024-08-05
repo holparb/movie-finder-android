@@ -7,36 +7,40 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Primary,
-    secondary = Secondary,
-    tertiary = Tertiary,
-    background = PrimaryBackground,
-    onBackground = SecondaryText,
-    error = Error,
-    onPrimary = PrimaryText,
-    onSecondary = SecondaryText,
-    surface = PrimaryBackground,
-    onSurface = PrimaryText,
-    primaryContainer = PrimaryBackground,
-    secondaryContainer = SecondaryBackground
+    primary = PrimaryColor,
+    onPrimary = PrimaryTextColor,
+    secondary = SecondaryColor,
+    onSecondary = SecondaryTextColor,
+    tertiary = TertiaryColor,
+    background = BackgroundDarkColor,
+    onBackground = SecondaryTextColor,
+    surface = SurfaceDark,
+    onSurface = SecondaryTextColor,
+    error = ErrorColor,
+    onError = OnErrorColor
 )
 
-// App only uses dark theme so this has the same color scheme as dark
 private val LightColorScheme = lightColorScheme(
-    primary = Primary,
-    secondary = Secondary,
-    tertiary = Tertiary,
-    background = PrimaryBackground,
-    onBackground = SecondaryText,
-    error = Error,
-    onPrimary = PrimaryText,
-    onSecondary = SecondaryText,
-    surface = PrimaryBackground,
-    primaryContainer = PrimaryBackground,
-    secondaryContainer = SecondaryBackground
+    primary = PrimaryColor,
+    onPrimary = PrimaryTextColor,
+    secondary = SecondaryColor,
+    onSecondary = SecondaryTextColor,
+    tertiary = PrimaryLightColor,
+    onTertiary = PrimaryTextColor,
+    background = BackgroundLightColor,
+    onBackground = Color.Black,
+    surface = SurfaceLight,
+    onSurface = Color.Black,
+    surfaceVariant = SurfaceLight,
+    onSurfaceVariant = Color.Black,
+    secondaryContainer = PrimaryColor,
+    onSecondaryContainer = Color.White,
+    error = ErrorColor,
+    onError = OnErrorColor,
 )
 
 @Composable

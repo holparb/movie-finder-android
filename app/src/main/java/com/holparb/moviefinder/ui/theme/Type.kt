@@ -12,30 +12,30 @@ val Typography = Typography(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.W400,
         fontSize = 16.sp,
-        color = PrimaryText
+        color = SecondaryTextColor
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontSize = 14.sp,
-        color = PrimaryText
+        color = SecondaryTextColor
     ),
     bodySmall = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.W400,
         fontSize = 12.sp,
-        color = PrimaryText
+        color = SecondaryTextColor
     ),
     titleLarge = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
-        color = SecondaryText
+        color = PrimaryTextColor
     ),
     titleMedium = TextStyle(
         fontSize = 20.sp,
-        color = SecondaryText
+        color = PrimaryTextColor
     ),
     titleSmall = TextStyle(
         fontSize = 18.sp,
-        color = SecondaryText
+        color = PrimaryTextColor
     )
 )
