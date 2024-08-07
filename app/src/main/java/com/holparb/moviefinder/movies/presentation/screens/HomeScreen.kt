@@ -1,7 +1,6 @@
 package com.holparb.moviefinder.movies.presentation.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +21,6 @@ import com.holparb.moviefinder.movies.presentation.viewmodels.PopularMoviesViewM
 @Composable
 fun HomeScreen(
     popularMoviesViewModel: PopularMoviesViewModel = hiltViewModel<PopularMoviesViewModel>(),
-    paddingValues: PaddingValues
 ) {
     val scrollState = rememberScrollState()
     val mainItemState by popularMoviesViewModel.mainItemState.collectAsStateWithLifecycle()
@@ -31,7 +29,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .verticalScroll(scrollState).padding(paddingValues)
+            .verticalScroll(scrollState).padding(bottom = 16.dp)
     ) {
         MainMovieItem(
             state = mainItemState,
@@ -39,17 +37,17 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         MovieHorizontalList(
-            movies = popularMoviesState.movies,
+            state = popularMoviesState,
             title = "Popular movies",
         )
         Spacer(modifier = Modifier.height(16.dp))
         MovieHorizontalList(
-            movies = popularMoviesState.movies,
+            state = popularMoviesState,
             title = "Top rated movies",
         )
         Spacer(modifier = Modifier.height(16.dp))
         MovieHorizontalList(
-            movies = popularMoviesState.movies,
+            state = popularMoviesState,
             title = "Upcoming movies"
         )
     }

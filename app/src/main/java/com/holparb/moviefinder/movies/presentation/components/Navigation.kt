@@ -1,6 +1,5 @@
 package com.holparb.moviefinder.movies.presentation.components
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
@@ -15,11 +14,10 @@ import kotlinx.serialization.Serializable
 @Composable
 fun Navigation(
     navController: NavHostController,
-    paddingValues: PaddingValues = PaddingValues()
 ) {
     NavHost(navController = navController, startDestination = HomeScreenComposable) {
         composable<HomeScreenComposable> {
-            HomeScreen(paddingValues = paddingValues)
+            HomeScreen()
         }
     }
 }

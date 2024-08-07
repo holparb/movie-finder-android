@@ -1,6 +1,7 @@
 package com.holparb.moviefinder.movies.presentation.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,10 +40,10 @@ fun MainScreen(
     ) { paddingValues ->
         Surface(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize().padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Navigation(navController = navController, paddingValues = paddingValues)
+            Navigation(navController = navController)
         }
     }
 

@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.presentation.states.MainItemState
-import com.holparb.moviefinder.movies.presentation.states.MainItemStatus
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -45,17 +44,8 @@ fun MainMovieItem(
     Box(
         modifier = modifier.fillMaxWidth()
     ) {
-        when(state.status) {
-            MainItemStatus.Loading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .width(64.dp)
-                        .align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-            }
-            MainItemStatus.Error -> {
+        when(state) {
+            is MainItemState.Error -> {
                 Text(
                     text = "Item failed to load, please check your network connection and try again",
                     style = TextStyle(
@@ -66,7 +56,16 @@ fun MainMovieItem(
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
-            MainItemStatus.Loaded -> {
+            MainItemState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .width(64.dp)
+                        .align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
+            is MainItemState.Success -> {
                 AsyncImage(
                     model = state.mainItem?.backdropPath,
                     error = rememberVectorPainter(image = Icons.Sharp.Warning),
@@ -108,26 +107,22 @@ fun MainMovieItem(
     }
 }
 
-class StatusParameterProvider: PreviewParameterProvider<MainItemStatus> {
-    override val values: Sequence<MainItemStatus>
-        get() = sequenceOf(MainItemStatus.Loading, MainItemStatus.Error, MainItemStatus.Loaded)
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun MainMovieItemPreview(
-    @PreviewParameter(provider = StatusParameterProvider::class) status: MainItemStatus
-) {
-    val state = MainItemState(
-        status = status,
-        mainItem = MovieListItem(
+class StateParameterProvider: PreviewParameterProvider<MainItemState> {
+    override val values: Sequence<MainItemState>
+        get() = sequenceOf(MainItemState.Loading, MainItemState.Error(), MainItemState.Success(MovieListItem(
             id = 1,
             title = "Title",
             releaseDate = LocalDate.now(),
             backdropPath = "https://image.tmdb.org/t/p/w500/A4JG9mkAjOQ3XNJy2oji1Jr224R.jpg",
             posterPath = "https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg"
-        )
-    )
+        )))
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MainMovieItemPreview(
+    @PreviewParameter(provider = StateParameterProvider::class) state: MainItemState
+) {
     MovieFinderTheme {
         MainMovieItem(state = state, modifier = Modifier.height(300.dp))
     }
