@@ -22,11 +22,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.holparb.moviefinder.movies.presentation.states.MovieListState
+import com.holparb.moviefinder.movies.domain.model.MovieListItem
+import com.holparb.moviefinder.movies.domain.util.MovieError
+import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 
 @Composable
 fun MovieHorizontalList(
-    state: MovieListState,
+    state: DataLoadState<List<MovieListItem>, MovieError>?,
     title: String,
     modifier: Modifier = Modifier,
 ) {
@@ -38,18 +40,7 @@ fun MovieHorizontalList(
         )
         Spacer(modifier = Modifier.height(12.dp))
         when(state) {
-            MovieListState.Empty -> {
-                Text(
-                    text = "No items in the list",
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        color = MaterialTheme.colorScheme.onSecondary
-                    ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-            }
-            is MovieListState.Error -> {
+            is DataLoadState.Error -> {
                 Text(
                     text = "Items failed to load, please check your network connection and try again",
                     style = TextStyle(
@@ -60,7 +51,7 @@ fun MovieHorizontalList(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
-            MovieListState.Loading -> {
+            DataLoadState.Loading -> {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .width(64.dp)
@@ -69,11 +60,11 @@ fun MovieHorizontalList(
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             }
-            is MovieListState.Success -> {
+            is DataLoadState.Loaded -> {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(state.movies) { item ->
+                    items(state.data) { item ->
                         MovieHorizontalListItem(
                             movie = item,
                             modifier = Modifier
@@ -83,20 +74,22 @@ fun MovieHorizontalList(
                     }
                 }
             }
+
+            null -> TODO()
         }
     }
 }
 
-class StateParameterProvider: PreviewParameterProvider<MovieListState> {
-    override val values: Sequence<MovieListState>
+class StateParameterProvider: PreviewParameterProvider<DataLoadState<List<MovieListItem>, MovieError>> {
+    override val values: Sequence<DataLoadState<List<MovieListItem>, MovieError>>
         get() = sequenceOf(
-            MovieListState.Empty, MovieListState.Loading, MovieListState.Error(), MovieListState.Success(emptyList()))
+            DataLoadState.Loading, DataLoadState.Error(MovieError.UnknownError()), DataLoadState.Loaded(emptyList()))
 }
 
 @Preview
 @Composable
 private fun MovieHorizontalListPreview(
-    @PreviewParameter(provider = StateParameterProvider::class) state: MovieListState
+    @PreviewParameter(provider = StateParameterProvider::class) state: DataLoadState<List<MovieListItem>, MovieError>
 ) {
     MovieHorizontalList(state = state, modifier = Modifier.height(250.dp), title = "Title")
 }

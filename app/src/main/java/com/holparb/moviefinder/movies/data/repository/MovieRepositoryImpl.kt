@@ -1,8 +1,8 @@
 package com.holparb.moviefinder.movies.data.repository
 
 import android.util.Log
-import com.holparb.moviefinder.BuildConfig
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
+import com.holparb.moviefinder.movies.data.dto.MovieListDto
 import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
@@ -11,10 +11,15 @@ import com.holparb.moviefinder.movies.domain.util.Resource
 import javax.inject.Inject
 
 class MovieRepositoryImpl @Inject constructor (private val api: TmdbApi): MovieRepository {
-    override suspend fun getPopularMovies(page: Int, region: String): Resource<List<MovieListItem>, MovieError.NetworkError> {
+
+    private suspend fun getMovies(
+        page: Int,
+        region: String,
+        apiFunction: suspend TmdbApi.(page: Int, region: String) -> MovieListDto
+    ): Resource<List<MovieListItem>, MovieError.NetworkError> {
         return try {
             Resource.Success(
-                api.getPopularMovies(authHeader = "Bearer ${BuildConfig.API_ACCESS_TOKEN}").results.map { movieListItemDto ->
+                api.apiFunction(page, region).results.map { movieListItemDto ->
                     movieListItemDto.toMovieListItem()
                 }
             )
@@ -25,5 +30,38 @@ class MovieRepositoryImpl @Inject constructor (private val api: TmdbApi): MovieR
                 error = MovieError.NetworkError("Couldn't fetch movie data, please try again!")
             )
         }
+    }
+
+    override suspend fun getPopularMovies(
+        page: Int,
+        region: String
+    ): Resource<List<MovieListItem>, MovieError.NetworkError> {
+        return getMovies(
+            apiFunction = { _, _ -> api.getPopularMovies(page, region) },
+            page = page,
+            region = region
+        )
+    }
+
+    override suspend fun getTopRatedMovies(
+        page: Int,
+        region: String
+    ): Resource<List<MovieListItem>, MovieError.NetworkError> {
+        return getMovies(
+            apiFunction = { _, _ -> api.getTopRatedMovies(page, region) },
+            page = page,
+            region = region
+        )
+    }
+
+    override suspend fun getUpcomingMovies(
+        page: Int,
+        region: String
+    ): Resource<List<MovieListItem>, MovieError.NetworkError> {
+        return getMovies(
+            apiFunction = { _, _ -> api.getUpcomingMovies(page, region) },
+            page = page,
+            region = region
+        )
     }
 }

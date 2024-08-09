@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.movies.data.datasource.remote
 
+import com.holparb.moviefinder.BuildConfig
 import com.holparb.moviefinder.movies.data.dto.MovieListDto
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -10,19 +11,21 @@ interface TmdbApi {
     suspend fun getPopularMovies(
         @Query("page") page: Int = 1,
         @Query("region") region: String = "US",
-        @Header("Authorization") authHeader: String
+        @Header("Authorization") authHeader: String = "Bearer ${BuildConfig.API_ACCESS_TOKEN}"
     ): MovieListDto
 
     @GET("3/movie/top_rated")
     suspend fun getTopRatedMovies(
         @Query("page") page: Int = 1,
-        @Query("region") region: String = "US"
+        @Query("region") region: String = "US",
+        @Header("Authorization") authHeader: String = "Bearer ${BuildConfig.API_ACCESS_TOKEN}"
     ): MovieListDto
 
     @GET("3/movie/upcoming")
     suspend fun getUpcomingMovies(
         @Query("page") page: Int = 1,
-        @Query("region") region: String = "US"
+        @Query("region") region: String = "US",
+        @Header("Authorization") authHeader: String = "Bearer ${BuildConfig.API_ACCESS_TOKEN}"
     ): MovieListDto
 
     companion object {

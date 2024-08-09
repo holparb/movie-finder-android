@@ -31,32 +31,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
-import com.holparb.moviefinder.movies.presentation.states.MainItemState
+import com.holparb.moviefinder.movies.domain.util.MovieError
+import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun MainMovieItem(
-    state: MainItemState,
+    dataLoadState: DataLoadState<List<MovieListItem>, MovieError>?,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier.fillMaxWidth()
     ) {
-        when(state) {
-            is MainItemState.Error -> {
+        when(dataLoadState) {
+            is DataLoadState.Error -> {
                 Text(
                     text = "Item failed to load, please check your network connection and try again",
                     style = TextStyle(
                         fontSize = 30.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.error
                     ),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
-            MainItemState.Loading -> {
+            DataLoadState.Loading -> {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .width(64.dp)
@@ -65,9 +65,9 @@ fun MainMovieItem(
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             }
-            is MainItemState.Success -> {
+            is DataLoadState.Loaded -> {
                 AsyncImage(
-                    model = state.mainItem?.backdropPath,
+                    model = dataLoadState.data.first().backdropPath,
                     error = rememberVectorPainter(image = Icons.Sharp.Warning),
                     contentDescription = "movie poster",
                     contentScale = ContentScale.FillHeight,
@@ -84,7 +84,7 @@ fun MainMovieItem(
                             )
                         )
                 )
-                state.mainItem?.let { mainItem ->
+                dataLoadState.data.first().let { mainItem ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -92,38 +92,48 @@ fun MainMovieItem(
                             .align(Alignment.BottomStart)
                     ) {
                         Text(
-                            text = state.mainItem.title ,
+                            text = mainItem.title ,
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = if(state.mainItem.releaseDate != null) state.mainItem.releaseDate.format(
+                            text = if(mainItem.releaseDate != null) mainItem.releaseDate.format(
                                 DateTimeFormatter.ofPattern("MMM dd, yyyy")) else "",
                         )
                     }
                 }
             }
+
+            null -> {
+                Text(
+                    text = "Item failed to load, please check your network connection and try again",
+                    style = TextStyle(
+                        fontSize = 30.sp,
+                        color = MaterialTheme.colorScheme.error
+                    ),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
         }
     }
 }
 
-class StateParameterProvider: PreviewParameterProvider<MainItemState> {
-    override val values: Sequence<MainItemState>
-        get() = sequenceOf(MainItemState.Loading, MainItemState.Error(), MainItemState.Success(MovieListItem(
-            id = 1,
-            title = "Title",
-            releaseDate = LocalDate.now(),
-            backdropPath = "https://image.tmdb.org/t/p/w500/A4JG9mkAjOQ3XNJy2oji1Jr224R.jpg",
-            posterPath = "https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg"
-        )))
+class StateParameterProvider: PreviewParameterProvider<DataLoadState<List<MovieListItem>, MovieError>> {
+    override val values: Sequence<DataLoadState<List<MovieListItem>, MovieError>>
+        get() = sequenceOf(
+            DataLoadState.Loading,
+            DataLoadState.Error(MovieError.UnknownError()),
+            DataLoadState.Loaded(emptyList())
+        )
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun MainMovieItemPreview(
-    @PreviewParameter(provider = StateParameterProvider::class) state: MainItemState
+    @PreviewParameter(provider = StateParameterProvider::class) state: DataLoadState<List<MovieListItem>, MovieError>
 ) {
     MovieFinderTheme {
-        MainMovieItem(state = state, modifier = Modifier.height(300.dp))
+        MainMovieItem(dataLoadState = state, modifier = Modifier.height(300.dp))
     }
 }

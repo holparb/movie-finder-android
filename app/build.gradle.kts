@@ -98,4 +98,8 @@ dependencies {
 
     // Image caching with Coil
     implementation(libs.coil.compose)
+
+    // Paging
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.paging.compose)
 }

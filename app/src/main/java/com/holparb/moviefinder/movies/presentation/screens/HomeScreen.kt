@@ -15,39 +15,40 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.holparb.moviefinder.movies.presentation.components.MainMovieItem
 import com.holparb.moviefinder.movies.presentation.components.horizontal_list.MovieHorizontalList
-import com.holparb.moviefinder.movies.presentation.events.PopularMoviesEvent
-import com.holparb.moviefinder.movies.presentation.viewmodels.PopularMoviesViewModel
+import com.holparb.moviefinder.movies.presentation.events.HomeScreenEvent
+import com.holparb.moviefinder.movies.presentation.states.HomeScreenState
+import com.holparb.moviefinder.movies.presentation.viewmodels.HomeScreenViewModel
 
 @Composable
 fun HomeScreen(
-    popularMoviesViewModel: PopularMoviesViewModel = hiltViewModel<PopularMoviesViewModel>(),
+    homeScreenViewModel: HomeScreenViewModel = hiltViewModel<HomeScreenViewModel>(),
 ) {
     val scrollState = rememberScrollState()
-    val mainItemState by popularMoviesViewModel.mainItemState.collectAsStateWithLifecycle()
-    val popularMoviesState by popularMoviesViewModel.popularMoviesState.collectAsStateWithLifecycle()
-    popularMoviesViewModel.onEvent(PopularMoviesEvent.LoadPopularMovies)
+    val state by homeScreenViewModel.state.collectAsStateWithLifecycle()
+    homeScreenViewModel.onEvent(HomeScreenEvent.LoadEverything)
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .verticalScroll(scrollState).padding(bottom = 16.dp)
+            .verticalScroll(scrollState)
+            .padding(bottom = 16.dp)
     ) {
         MainMovieItem(
-            state = mainItemState,
+            dataLoadState = state.movieLists[HomeScreenState.mainItem],
             modifier = Modifier.height(280.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
         MovieHorizontalList(
-            state = popularMoviesState,
+            state = state.movieLists[HomeScreenState.popularMovies],
             title = "Popular movies",
         )
         Spacer(modifier = Modifier.height(16.dp))
         MovieHorizontalList(
-            state = popularMoviesState,
+            state = state.movieLists[HomeScreenState.topRatedMovies],
             title = "Top rated movies",
         )
         Spacer(modifier = Modifier.height(16.dp))
         MovieHorizontalList(
-            state = popularMoviesState,
+            state = state.movieLists[HomeScreenState.upcomingMovies],
             title = "Upcoming movies"
         )
     }
