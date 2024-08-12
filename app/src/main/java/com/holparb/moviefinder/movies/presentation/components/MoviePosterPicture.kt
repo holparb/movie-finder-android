@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movies.presentation.components.horizontal_list
+package com.holparb.moviefinder.movies.presentation.components
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +18,7 @@ import com.holparb.moviefinder.ui.theme.Shapes
 import java.time.LocalDate
 
 @Composable
-fun MovieHorizontalListItem(
+fun MoviePosterPicture(
     movie: MovieListItem,
     modifier: Modifier = Modifier
 ) {
@@ -36,8 +36,8 @@ fun MovieHorizontalListItem(
 @Preview
 @Composable
 private fun MovieHorizontalListItemPreview() {
-    MovieHorizontalListItem(
-        MovieListItem(id = 1, title = "Title", releaseDate = LocalDate.now(), posterPath = "", backdropPath = ""),
+    MoviePosterPicture(
+        MovieListItem(id = 1, title = "Title", releaseDate = LocalDate.now(), posterPath = "", overview = "", backdropPath = ""),
         modifier = Modifier
             .width(150.dp)
             .height(225.dp))

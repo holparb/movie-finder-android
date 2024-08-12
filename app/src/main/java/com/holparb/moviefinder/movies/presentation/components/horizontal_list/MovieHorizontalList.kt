@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.util.MovieError
+import com.holparb.moviefinder.movies.presentation.components.MoviePosterPicture
 import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 
 @Composable
@@ -65,7 +66,7 @@ fun MovieHorizontalList(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(state.data) { item ->
-                        MovieHorizontalListItem(
+                        MoviePosterPicture(
                             movie = item,
                             modifier = Modifier
                                 .width(120.dp)
