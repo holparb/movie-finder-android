@@ -6,9 +6,10 @@ import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.movies.domain.util.Resource
-import com.holparb.moviefinder.movies.presentation.events.HomeScreenEvent
+import com.holparb.moviefinder.movies.presentation.events.MovieListLoadEvent
 import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 import com.holparb.moviefinder.movies.presentation.states.HomeScreenState
+import com.holparb.moviefinder.movies.presentation.states.MovieListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,11 +27,20 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun updateMovieListState(key: String, newValue: DataLoadState<List<MovieListItem>, MovieError>) {
         val newMap = _state.value.movieLists.toMutableMap()
-        newMap[key] = newValue
+        newMap[key] = MovieListState(movieList = newValue, loadEvent = resolveEventType(key))
         _state.update {
             it.copy(
                 movieLists = newMap.toMap()
             )
+        }
+    }
+
+    private fun resolveEventType(key: String): MovieListLoadEvent {
+        return when(key) {
+            HomeScreenState.POPULAR_MOVIES -> MovieListLoadEvent.LoadPopularMovies
+            HomeScreenState.TOP_RATED_MOVIES -> MovieListLoadEvent.LoadTopRatedMovies
+            HomeScreenState.UPCOMING_MOVIES -> MovieListLoadEvent.LoadUpcomingMovies
+            else -> MovieListLoadEvent.Unknown
         }
     }
 
@@ -50,40 +60,41 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun loadPopularMoviesAndMainItem() {
         viewModelScope.launch {
-            updateMovieListState(HomeScreenState.popularMovies, DataLoadState.Loading)
-            updateMovieListState(HomeScreenState.mainItem, DataLoadState.Loading)
+            updateMovieListState(HomeScreenState.POPULAR_MOVIES, DataLoadState.Loading)
+            updateMovieListState(HomeScreenState.MAIN_ITEM, DataLoadState.Loading)
             val result = repository.getPopularMovies()
-            updateMovieListStateBasedOnResult(HomeScreenState.popularMovies, result)
-            updateMovieListStateBasedOnResult(HomeScreenState.mainItem, result)
+            updateMovieListStateBasedOnResult(HomeScreenState.POPULAR_MOVIES, result)
+            updateMovieListStateBasedOnResult(HomeScreenState.MAIN_ITEM, result)
+        }
+    }
+
+    private fun loadPopularMovies() {
+        viewModelScope.launch {
+            updateMovieListState(HomeScreenState.POPULAR_MOVIES, DataLoadState.Loading)
+            val result = repository.getPopularMovies()
+            updateMovieListStateBasedOnResult(HomeScreenState.POPULAR_MOVIES, result)
         }
     }
 
     private fun loadTopRatedMovies() {
         viewModelScope.launch {
-            updateMovieListState(HomeScreenState.topRatedMovies, DataLoadState.Loading)
+            updateMovieListState(HomeScreenState.TOP_RATED_MOVIES, DataLoadState.Loading)
             val result = repository.getTopRatedMovies()
-            updateMovieListStateBasedOnResult(HomeScreenState.topRatedMovies, result)
+            updateMovieListStateBasedOnResult(HomeScreenState.TOP_RATED_MOVIES, result)
         }
     }
 
     private fun loadUpcomingMovies() {
         viewModelScope.launch {
-            updateMovieListState(HomeScreenState.upcomingMovies, DataLoadState.Loading)
+            updateMovieListState(HomeScreenState.UPCOMING_MOVIES, DataLoadState.Loading)
             val result = repository.getUpcomingMovies()
-            updateMovieListStateBasedOnResult(HomeScreenState.upcomingMovies, result)
+            updateMovieListStateBasedOnResult(HomeScreenState.UPCOMING_MOVIES, result)
         }
     }
 
-    fun onEvent(event: HomeScreenEvent) {
-        when(event) {
-            HomeScreenEvent.LoadPopularMovies -> loadPopularMoviesAndMainItem()
-            HomeScreenEvent.LoadTopRatedMovies -> loadTopRatedMovies()
-            HomeScreenEvent.LoadUpcomingMovies -> loadUpcomingMovies()
-            HomeScreenEvent.LoadEverything -> {
-                loadPopularMoviesAndMainItem()
-                loadTopRatedMovies()
-                loadUpcomingMovies()
-            }
-        }
+    fun loadHomeScreenContent() {
+        loadPopularMoviesAndMainItem()
+        loadTopRatedMovies()
+        loadUpcomingMovies()
     }
 }

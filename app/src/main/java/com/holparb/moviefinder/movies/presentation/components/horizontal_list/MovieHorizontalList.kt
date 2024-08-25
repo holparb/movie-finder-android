@@ -22,25 +22,34 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.holparb.moviefinder.movies.domain.model.MovieListItem
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.movies.presentation.components.MoviePosterPicture
+import com.holparb.moviefinder.movies.presentation.components.navigation.SeeMoreScreenComposable
 import com.holparb.moviefinder.movies.presentation.states.DataLoadState
+import com.holparb.moviefinder.movies.presentation.states.MovieListState
 
 @Composable
 fun MovieHorizontalList(
-    state: DataLoadState<List<MovieListItem>, MovieError>?,
+    state: MovieListState,
     title: String,
+    navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
         SectionHeader(
-            title = title, onClick = {}
+            title = title,
+            onClick = {
+                navController.navigate(SeeMoreScreenComposable(title = title, loadEvent = state.loadEvent))
+            }
         )
         Spacer(modifier = Modifier.height(12.dp))
-        when(state) {
+        when(state.movieList) {
             is DataLoadState.Error -> {
                 Text(
                     text = "Items failed to load, please check your network connection and try again",
@@ -65,7 +74,7 @@ fun MovieHorizontalList(
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(state.data) { item ->
+                    items(state.movieList.data) { item ->
                         MoviePosterPicture(
                             movie = item,
                             modifier = Modifier
@@ -75,22 +84,23 @@ fun MovieHorizontalList(
                     }
                 }
             }
-
-            null -> TODO()
         }
     }
 }
 
-class StateParameterProvider: PreviewParameterProvider<DataLoadState<List<MovieListItem>, MovieError>> {
-    override val values: Sequence<DataLoadState<List<MovieListItem>, MovieError>>
+class StateParameterProvider: PreviewParameterProvider<MovieListState> {
+    override val values: Sequence<MovieListState>
         get() = sequenceOf(
-            DataLoadState.Loading, DataLoadState.Error(MovieError.UnknownError()), DataLoadState.Loaded(emptyList()))
+            MovieListState(movieList = DataLoadState.Loading),
+            MovieListState(movieList = DataLoadState.Error(MovieError.UnknownError())),
+            MovieListState(movieList = DataLoadState.Loaded(emptyList()))
+        )
 }
 
 @Preview
 @Composable
 private fun MovieHorizontalListPreview(
-    @PreviewParameter(provider = StateParameterProvider::class) state: DataLoadState<List<MovieListItem>, MovieError>
+    @PreviewParameter(provider = StateParameterProvider::class) state: MovieListState
 ) {
-    MovieHorizontalList(state = state, modifier = Modifier.height(250.dp), title = "Title")
+    MovieHorizontalList(state = state, modifier = Modifier.height(250.dp), title = "Title", navController = rememberNavController())
 }

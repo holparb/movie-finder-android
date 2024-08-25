@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.movies.presentation.components.horizontal_list
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +28,10 @@ fun SectionHeader(
         )
         Text(
             text = "see more >",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.clickable(
+                onClick = onClick
+            )
         )
     }
 }

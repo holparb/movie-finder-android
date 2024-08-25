@@ -16,12 +16,20 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.holparb.moviefinder.movies.presentation.screens.BottomNavigationItem
+import androidx.navigation.NavHostController
 import com.holparb.moviefinder.ui.theme.SecondaryTextColor
+
+data class BottomNavigationItem(
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector
+)
 
 @Composable
 fun BottomNavigationBar(
+    navController: NavHostController,
     selectedIndex: Int,
     changeNavigationSelectedIndex: (Int) -> Unit,
 ) {
