@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.movies.presentation.components.vertical_list
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -56,11 +57,12 @@ fun MovieVerticalList(
         }
         is DataLoadState.Loaded -> {
             LazyColumn(
-                modifier.fillMaxSize()
+                modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(dataLoadState.data) { item ->
                     MovieVerticalListItem(
-                        modifier = Modifier.height(250.dp),
+                        modifier = Modifier.height(200.dp),
                         movieListItem = item
                     )
                 }

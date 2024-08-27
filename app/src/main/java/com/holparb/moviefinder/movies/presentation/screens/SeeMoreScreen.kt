@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.holparb.moviefinder.movies.presentation.components.vertical_list.MovieVerticalList
@@ -45,11 +44,10 @@ fun SeeMoreScreen(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Transparent,
                 ),
+                modifier = Modifier.fillMaxWidth(),
                 title = {
                     Text(
                         text = title,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 navigationIcon = {
@@ -77,5 +75,5 @@ fun SeeMoreScreen(
 @Preview
 @Composable
 private fun SeeMoreScreenPreview() {
-    SeeMoreScreen(title = "Movies", loadEvent = MovieListLoadEvent.Unknown, onBack = {}, onEvent = {_ -> {}}, state = MovieListState())
+    SeeMoreScreen(title = "Movies", loadEvent = MovieListLoadEvent.Unknown, onBack = {}, onEvent = {_ -> run {} }, state = MovieListState())
 }

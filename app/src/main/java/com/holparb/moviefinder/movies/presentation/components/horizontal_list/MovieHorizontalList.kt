@@ -75,6 +75,7 @@ fun MovieHorizontalList(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(state.movieList.data) { item ->
+
                         MoviePosterPicture(
                             movie = item,
                             modifier = Modifier

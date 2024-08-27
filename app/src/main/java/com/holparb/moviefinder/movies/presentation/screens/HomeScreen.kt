@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -22,9 +21,9 @@ import com.holparb.moviefinder.movies.presentation.viewmodels.HomeScreenViewMode
 
 @Composable
 fun HomeScreen(
-    homeScreenViewModel: HomeScreenViewModel = hiltViewModel<HomeScreenViewModel>(),
     navController: NavHostController
 ) {
+    val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
     val scrollState = rememberScrollState()
     val state by homeScreenViewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
@@ -35,7 +34,6 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(scrollState)
-            .padding(bottom = 16.dp)
     ) {
         MainMovieItem(
             dataLoadState = state.movieLists[HomeScreenState.MAIN_ITEM]?.movieList,

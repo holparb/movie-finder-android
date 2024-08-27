@@ -17,26 +17,35 @@ import kotlin.reflect.typeOf
 
 @Composable
 fun Navigation(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = BottomNavScreenComposable.HomeScreenComposable) {
-        composable<BottomNavScreenComposable.HomeScreenComposable> {
+    NavHost(navController = navController, startDestination = HomeScreenComposable) {
+        composable<HomeScreenComposable> {
             HomeScreen(navController = navController)
         }
         composable<SeeMoreScreenComposable>(
             typeMap = mapOf(typeOf<MovieListLoadEvent>() to MovieListLoadEventType)
-        ) {
-            val args = it.toRoute<SeeMoreScreenComposable>()
+        ) { backStackEntry ->
+            val args = backStackEntry.toRoute<SeeMoreScreenComposable>()
             val movieListViewModel = hiltViewModel<MovieListViewModel>()
             val movieListState by movieListViewModel.state.collectAsStateWithLifecycle()
-            SeeMoreScreen(state = movieListState, onEvent = movieListViewModel::onEvent, title = args.title, loadEvent = args.loadEvent, onBack = { navController.popBackStack() })
+            SeeMoreScreen(
+                state = movieListState,
+                onEvent = movieListViewModel::onEvent,
+                title = args.title,
+                loadEvent = args.loadEvent,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }
 
 @Serializable
-sealed class BottomNavScreenComposable {
-    @Serializable
-    object HomeScreenComposable
-}
+object HomeScreenComposable
+
+@Serializable
+object WatchlistComposable
+
+@Serializable
+object SearchScreenComposable
 
 @Serializable
 data class SeeMoreScreenComposable(
