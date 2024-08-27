@@ -1,8 +1,10 @@
 package com.holparb.moviefinder.movies.data.repository
 
 import android.util.Log
+import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.dto.MovieListDto
+import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
@@ -10,7 +12,10 @@ import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.movies.domain.util.Resource
 import javax.inject.Inject
 
-class MovieRepositoryImpl @Inject constructor (private val api: TmdbApi): MovieRepository {
+class MovieRepositoryImpl @Inject constructor (
+    private val api: TmdbApi,
+    private val dao: MovieDao
+): MovieRepository {
 
     private suspend fun getMovies(
         page: Int,
@@ -20,6 +25,7 @@ class MovieRepositoryImpl @Inject constructor (private val api: TmdbApi): MovieR
         return try {
             Resource.Success(
                 api.apiFunction(page, region).results.map { movieListItemDto ->
+                    dao.upsertMovie(movieListItemDto.toMovieEntity())
                     movieListItemDto.toMovieListItem()
                 }
             )

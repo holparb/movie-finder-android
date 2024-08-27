@@ -1,5 +1,9 @@
 package com.holparb.moviefinder.di
 
+import android.content.Context
+import androidx.room.Room
+import com.holparb.moviefinder.movies.data.dao.MovieDao
+import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.repository.MovieRepositoryImpl
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
@@ -7,6 +11,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -19,12 +24,28 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesTmdbApi(): TmdbApi {
+    fun provideTmdbApi(): TmdbApi {
         return Retrofit.Builder()
             .baseUrl(TmdbApi.BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
             .create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMovieDao(movieDatabase: MovieDatabase): MovieDao {
+        return movieDatabase.movieDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalDatabase(@ApplicationContext appContext: Context): MovieDatabase {
+        return Room.databaseBuilder(
+            appContext,
+            MovieDatabase::class.java,
+            name = "movie-database"
+        ).build()
     }
 }
 

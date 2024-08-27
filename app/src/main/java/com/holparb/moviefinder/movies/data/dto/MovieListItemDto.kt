@@ -16,5 +16,7 @@ data class MovieListItemDto(
     @field:Json(name = "backdrop_path")
     val backdropPath: String?,
     @field:Json(name = "release_date")
-    val releaseDate: String?
+    val releaseDate: String?,
+    @field:Json(name = "genre_ids")
+    val genreIds: List<Int>
 )
