@@ -7,5 +7,8 @@ import com.holparb.moviefinder.movies.data.entity.MovieEntity
 @Dao
 interface MovieDao {
     @Upsert
+    suspend fun upsertMovies(movies: List<MovieEntity>)
+
+    @Upsert
     suspend fun upsertMovie(movie: MovieEntity)
 }
