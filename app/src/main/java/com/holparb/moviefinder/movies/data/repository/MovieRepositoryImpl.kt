@@ -3,7 +3,7 @@ package com.holparb.moviefinder.movies.data.repository
 import android.util.Log
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
-import com.holparb.moviefinder.movies.data.dto.MovieListDto
+import com.holparb.moviefinder.movies.data.dto.MovieListResponseDto
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
@@ -20,7 +20,7 @@ class MovieRepositoryImpl @Inject constructor (
     private suspend fun getMovies(
         page: Int,
         region: String,
-        apiFunction: suspend TmdbApi.(page: Int, region: String) -> MovieListDto
+        apiFunction: suspend TmdbApi.(page: Int, region: String) -> MovieListResponseDto
     ): Resource<List<MovieListItem>, MovieError.NetworkError> {
         return try {
             Resource.Success(
