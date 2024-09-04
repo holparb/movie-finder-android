@@ -1,20 +1,27 @@
 package com.holparb.moviefinder.movies.data.repository
 
 import android.util.Log
-import com.holparb.moviefinder.movies.data.dao.MovieDao
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
+import com.holparb.moviefinder.movies.data.datasource.local.MovieRemoteMediator
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.dto.MovieListResponseDto
+import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.movies.domain.util.Resource
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class MovieRepositoryImpl @Inject constructor (
     private val api: TmdbApi,
-    private val dao: MovieDao
+    private val database: MovieDatabase,
 ): MovieRepository {
 
     private suspend fun getMovies(
@@ -25,7 +32,7 @@ class MovieRepositoryImpl @Inject constructor (
         return try {
             Resource.Success(
                 api.apiFunction(page, region).results.map { movieListItemDto ->
-                    dao.upsertMovie(movieListItemDto.toMovieEntity())
+                    database.movieDao.upsertMovie(movieListItemDto.toMovieEntity())
                     movieListItemDto.toMovieListItem()
                 }
             )
@@ -47,6 +54,19 @@ class MovieRepositoryImpl @Inject constructor (
             page = page,
             region = region
         )
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    override suspend fun getPopularMoviesWithPagination(): Flow<PagingData<MovieEntity>> {
+        return Pager(
+            PagingConfig(pageSize = 20),
+            remoteMediator = MovieRemoteMediator(
+                movieDatabase = database,
+                tmdbApi = api,
+                tmdpApiCallType = TmdbApi.Companion.ApiCallType.GET_POPULAR_MOVIES
+            ),
+            pagingSourceFactory = { database.movieDao.getPopularMoviesWithPagination() }
+        ).flow
     }
 
     override suspend fun getTopRatedMovies(

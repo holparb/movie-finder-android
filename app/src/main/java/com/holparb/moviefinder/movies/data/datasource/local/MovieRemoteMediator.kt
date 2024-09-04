@@ -9,8 +9,6 @@ import androidx.room.withTransaction
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
-import retrofit2.HttpException
-import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
 class MovieRemoteMediator(
@@ -53,9 +51,8 @@ class MovieRemoteMediator(
             }
 
             MediatorResult.Success(endOfPaginationReached = movieListResponse.results.isEmpty())
-        } catch (e: IOException) {
-            MediatorResult.Error(e)
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
+            Log.e(MovieRemoteMediator::class.simpleName, e.message.toString())
             MediatorResult.Error(e)
         }
     }

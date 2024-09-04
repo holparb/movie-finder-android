@@ -44,7 +44,7 @@ object AppModule {
         return Room.databaseBuilder(
             appContext,
             MovieDatabase::class.java,
-            name = "movie-database"
+            name = "movie-database.db"
         ).build()
     }
 }

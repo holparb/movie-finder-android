@@ -20,21 +20,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.holparb.moviefinder.movies.presentation.components.vertical_list.MovieVerticalList
 import com.holparb.moviefinder.movies.presentation.events.MovieListLoadEvent
-import com.holparb.moviefinder.movies.presentation.states.MovieListState
+import com.holparb.moviefinder.movies.presentation.viewmodels.MovieListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeeMoreScreen(
-    state: MovieListState,
-    onEvent: (MovieListLoadEvent) -> Unit,
     title: String,
     loadEvent: MovieListLoadEvent,
     onBack: () -> Unit
 ) {
+    val movieListViewModel = hiltViewModel<MovieListViewModel>()
+    val movies = movieListViewModel.pagingDataFlow.collectAsLazyPagingItems()
     LaunchedEffect(Unit) {
-        onEvent(loadEvent)
+        movieListViewModel.onEvent(loadEvent)
     }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
@@ -67,7 +69,7 @@ fun SeeMoreScreen(
                 .fillMaxWidth()
                 .padding(paddingValues)
         ) {
-            MovieVerticalList(dataLoadState = state.movieList)
+            MovieVerticalList(movies = movies)
         }
     }
 }
@@ -75,5 +77,5 @@ fun SeeMoreScreen(
 @Preview
 @Composable
 private fun SeeMoreScreenPreview() {
-    SeeMoreScreen(title = "Movies", loadEvent = MovieListLoadEvent.Unknown, onBack = {}, onEvent = {_ -> run {} }, state = MovieListState())
+    SeeMoreScreen(title = "Movies", loadEvent = MovieListLoadEvent.Unknown, onBack = {})
 }

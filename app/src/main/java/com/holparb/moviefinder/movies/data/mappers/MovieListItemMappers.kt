@@ -18,7 +18,7 @@ fun MovieListItemDto.toMovieListItem(): MovieListItem {
     )
 }
 
-fun MovieListItemDto.toMovieEntity(): MovieEntity {
+fun MovieListItemDto.toMovieEntity(isPopular: Boolean = false, isTopRated: Boolean = false, isUpcoming: Boolean = false): MovieEntity {
     return MovieEntity(
         id = this.id,
         title = this.title,
@@ -26,7 +26,10 @@ fun MovieListItemDto.toMovieEntity(): MovieEntity {
         releaseDate = this.releaseDate,
         posterPath = if(!this.posterPath.isNullOrEmpty()) TmdbApi.IMAGE_URL_W500.plus(this.posterPath) else null,
         backdropPath = if(!this.backdropPath.isNullOrEmpty()) TmdbApi.IMAGE_URL_W780.plus(this.backdropPath) else null,
-        genreIds = this.genreIds
+        genreIds = this.genreIds,
+        isPopular = isPopular,
+        isTopRated = isTopRated,
+        isUpcoming = isUpcoming
     )
 }
 

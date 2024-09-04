@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.movies.data.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
@@ -15,4 +16,7 @@ interface MovieDao {
 
     @Query("DELETE FROM movies")
     suspend fun clearAll()
+
+    @Query("SELECT * FROM movies WHERE is_popular")
+    fun getPopularMoviesWithPagination(): PagingSource<Int, MovieEntity>
 }
