@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movies.data.datasource.local
+package com.holparb.moviefinder.movies.data.datasource.remote
 
 import android.util.Log
 import androidx.paging.ExperimentalPagingApi
@@ -6,7 +6,7 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
+import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
 

@@ -6,7 +6,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
-import com.holparb.moviefinder.movies.data.datasource.local.MovieRemoteMediator
+import com.holparb.moviefinder.movies.data.datasource.remote.MovieRemoteMediator
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.dto.MovieListResponseDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
