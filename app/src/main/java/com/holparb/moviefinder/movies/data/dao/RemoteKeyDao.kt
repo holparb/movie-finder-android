@@ -1,10 +1,8 @@
 package com.holparb.moviefinder.movies.data.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.entity.RemoteKeyEntity
 
 @Dao
@@ -15,6 +13,9 @@ interface RemoteKeyDao {
     @Query("DELETE FROM remote_keys")
     suspend fun clearAll()
 
+    @Query("DELETE FROM remote_keys WHERE id ")
+    suspend fun deleteRemoteKeyById(id: Int)
+
     @Query("SELECT * FROM remote_keys WHERE id = :id")
-    fun getPopularMoviesWithPagination(id: String): PagingSource<Int, MovieEntity>
+    suspend fun getRemoteKeyById(id: Int): RemoteKeyEntity?
 }
