@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.movies.presentation.components.vertical_list
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,8 +10,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -22,6 +25,17 @@ fun MovieVerticalList(
     movies: LazyPagingItems<MovieListItem>,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(key1 = movies.loadState) {
+        if(movies.loadState.refresh is LoadState.Error) {
+            Toast.makeText(
+                context,
+                "Error: " + (movies.loadState.refresh as LoadState.Error).error.message,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     when(movies.loadState.refresh) {
         is LoadState.Loading -> {
             Box(

@@ -38,7 +38,7 @@ class MovieRemoteMediator(
         state: PagingState<Int, MovieEntity>
     ): MediatorResult {
         return try {
-            val remoteKey = movieDatabase.remoteKeyDao.getRemoteKeyById(remoteKeyType.ordinal)
+             val remoteKey = movieDatabase.remoteKeyDao.getRemoteKeyById(remoteKeyType.ordinal)
             val page = when(loadType) {
                 LoadType.REFRESH -> 1
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
@@ -71,7 +71,11 @@ class MovieRemoteMediator(
                     )
                 )
                 val movieEntities = movieListResponse.results.map {
-                    it.toMovieEntity()
+                    when(remoteKeyType) {
+                        RemoteKeyType.PopularMovies -> it.toMovieEntity(isPopular = true)
+                        RemoteKeyType.TopRatedMovies -> it.toMovieEntity(isTopRated = true)
+                        RemoteKeyType.UpcomingMovies -> it.toMovieEntity(isUpcoming = true)
+                    }
                 }
                 movieDatabase.movieDao.upsertMovies(movieEntities)
             }

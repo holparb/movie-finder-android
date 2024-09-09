@@ -34,10 +34,10 @@ fun SeeMoreScreen(
     onBack: () -> Unit
 ) {
     val movieListViewModel = hiltViewModel<MovieListViewModel>()
-    val movies = movieListViewModel.pagingDataFlow.collectAsLazyPagingItems()
     LaunchedEffect(Unit) {
         movieListViewModel.onEvent(loadEvent)
     }
+    val movies = movieListViewModel.pagingDataFlow.collectAsLazyPagingItems()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.fillMaxSize().padding(16.dp),

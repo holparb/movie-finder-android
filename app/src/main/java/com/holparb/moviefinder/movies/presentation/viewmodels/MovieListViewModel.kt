@@ -21,12 +21,8 @@ class MovieListViewModel @Inject constructor(
     private val repository: MovieRepository,
 ): ViewModel() {
 
-    //private val _state = MutableStateFlow<PagingData<MovieListItem>>(PagingData.empty())
-    //val state = _state.asStateFlow()
-
     private var _pagingDataFlow: Flow<PagingData<MovieListItem>> = flowOf(PagingData.empty())
     val pagingDataFlow: Flow<PagingData<MovieListItem>> get() = _pagingDataFlow
-
 
     fun onEvent(event: MovieListLoadEvent) {
         viewModelScope.launch {
@@ -46,6 +42,5 @@ class MovieListViewModel @Inject constructor(
                 }
             }
         }
-
     }
 }

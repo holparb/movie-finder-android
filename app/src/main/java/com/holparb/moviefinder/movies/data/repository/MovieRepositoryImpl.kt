@@ -10,7 +10,7 @@ import com.holparb.moviefinder.movies.data.datasource.remote.MovieRemoteMediator
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.dto.MovieListResponseDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
-import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
+import com.holparb.moviefinder.movies.data.entity.RemoteKeyType
 import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
@@ -32,7 +32,7 @@ class MovieRepositoryImpl @Inject constructor (
         return try {
             Resource.Success(
                 api.apiFunction(page, region).results.map { movieListItemDto ->
-                    database.movieDao.upsertMovie(movieListItemDto.toMovieEntity())
+                    //database.movieDao.upsertMovie(movieListItemDto.toMovieEntity())
                     movieListItemDto.toMovieListItem()
                 }
             )
@@ -63,7 +63,7 @@ class MovieRepositoryImpl @Inject constructor (
             remoteMediator = MovieRemoteMediator(
                 movieDatabase = database,
                 tmdbApi = api,
-                tmdpApiCallType = TmdbApi.Companion.ApiCallType.GET_POPULAR_MOVIES
+                remoteKeyType = RemoteKeyType.PopularMovies
             ),
             pagingSourceFactory = { database.movieDao.getPopularMoviesWithPagination() }
         ).flow
