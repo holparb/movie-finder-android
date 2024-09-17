@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.movies.presentation.components.vertical_list
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ fun MovieVerticalList(
     val context = LocalContext.current
     LaunchedEffect(key1 = movies.loadState) {
         if(movies.loadState.refresh is LoadState.Error) {
+            Log.e("MovieVerticalList", "Error: " + (movies.loadState.refresh as LoadState.Error).error.message)
             Toast.makeText(
                 context,
                 "Error: " + (movies.loadState.refresh as LoadState.Error).error.message,

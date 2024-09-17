@@ -32,9 +32,5 @@ interface TmdbApi {
         const val BASE_URL: String = "https://api.themoviedb.org/"
         const val IMAGE_URL_W500: String = "https://image.tmdb.org/t/p/w500"
         const val IMAGE_URL_W780: String = "https://image.tmdb.org/t/p/w780"
-
-        enum class ApiCallType {
-            GET_POPULAR_MOVIES, GET_TOP_RATED_MOVIES, GET_UPCOMING_MOVIES
-        }
     }
 }

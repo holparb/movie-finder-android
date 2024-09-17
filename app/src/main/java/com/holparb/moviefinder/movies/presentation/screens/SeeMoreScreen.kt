@@ -35,7 +35,7 @@ fun SeeMoreScreen(
 ) {
     val movieListViewModel = hiltViewModel<MovieListViewModel>()
     LaunchedEffect(Unit) {
-        movieListViewModel.onEvent(loadEvent)
+        movieListViewModel.loadMovies(loadEvent)
     }
     val movies = movieListViewModel.pagingDataFlow.collectAsLazyPagingItems()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())

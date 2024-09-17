@@ -4,15 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.map
-import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.presentation.events.MovieListLoadEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,19 +21,12 @@ class MovieListViewModel @Inject constructor(
     private var _pagingDataFlow: Flow<PagingData<MovieListItem>> = flowOf(PagingData.empty())
     val pagingDataFlow: Flow<PagingData<MovieListItem>> get() = _pagingDataFlow
 
-    fun onEvent(event: MovieListLoadEvent) {
+    fun loadMovies(event: MovieListLoadEvent) {
         viewModelScope.launch {
-            when(event) {
-                MovieListLoadEvent.LoadPopularMovies -> {
-                    _pagingDataFlow = repository.getPopularMoviesWithPagination().map { pagingData ->
-                        pagingData.map {
-                            it.toMovieListItem()
-                        }
-                    }.cachedIn(viewModelScope)
-
-                }
-                MovieListLoadEvent.LoadTopRatedMovies -> TODO()
-                MovieListLoadEvent.LoadUpcomingMovies -> TODO()
+            _pagingDataFlow = when(event) {
+                MovieListLoadEvent.LoadPopularMovies -> repository.getPopularMoviesWithPagination().cachedIn(viewModelScope)
+                MovieListLoadEvent.LoadTopRatedMovies -> repository.getTopRatedMoviesWithPagination().cachedIn(viewModelScope)
+                MovieListLoadEvent.LoadUpcomingMovies -> repository.getUpcomingWithPagination().cachedIn(viewModelScope)
                 MovieListLoadEvent.Unknown -> {
                     throw Exception("Unknown MovieListLoadEvent")
                 }

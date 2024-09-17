@@ -9,7 +9,6 @@ import androidx.room.withTransaction
 import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.entity.RemoteKeyEntity
-import com.holparb.moviefinder.movies.data.entity.RemoteKeyType
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
 import java.util.concurrent.TimeUnit
 
@@ -17,11 +16,11 @@ import java.util.concurrent.TimeUnit
 class MovieRemoteMediator(
     private val movieDatabase: MovieDatabase,
     private val tmdbApi: TmdbApi,
-    private val remoteKeyType: RemoteKeyType
+    private val movieListType: MovieListType
 ): RemoteMediator<Int, MovieEntity>() {
 
     override suspend fun initialize(): InitializeAction {
-        val remoteKey = movieDatabase.remoteKeyDao.getRemoteKeyById(remoteKeyType.ordinal) ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
+        val remoteKey = movieDatabase.remoteKeyDao.getRemoteKeyById(movieListType.ordinal) ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
 
         val cacheTimeout = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS)
 
@@ -38,7 +37,7 @@ class MovieRemoteMediator(
         state: PagingState<Int, MovieEntity>
     ): MediatorResult {
         return try {
-             val remoteKey = movieDatabase.remoteKeyDao.getRemoteKeyById(remoteKeyType.ordinal)
+             val remoteKey = movieDatabase.remoteKeyDao.getRemoteKeyById(movieListType.ordinal)
             val page = when(loadType) {
                 LoadType.REFRESH -> 1
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
@@ -51,10 +50,10 @@ class MovieRemoteMediator(
                 }
             }
             Log.d(MovieRemoteMediator::class.simpleName, "Current page: $page")
-            val movieListResponse = when (remoteKeyType) {
-                RemoteKeyType.PopularMovies -> tmdbApi.getPopularMovies(page = page)
-                RemoteKeyType.TopRatedMovies -> tmdbApi.getPopularMovies(page = page)
-                RemoteKeyType.UpcomingMovies -> tmdbApi.getPopularMovies(page = page)
+            val movieListResponse = when (movieListType) {
+                MovieListType.PopularMovies -> tmdbApi.getPopularMovies(page = page)
+                MovieListType.TopRatedMovies -> tmdbApi.getPopularMovies(page = page)
+                MovieListType.UpcomingMovies -> tmdbApi.getPopularMovies(page = page)
             }
 
             val nextPage = if (movieListResponse.results.isNotEmpty()) page + 1 else null
@@ -65,16 +64,16 @@ class MovieRemoteMediator(
                 }
                 movieDatabase.remoteKeyDao.upsertRemoteKey(
                     RemoteKeyEntity(
-                        id = remoteKeyType.ordinal,
+                        id = movieListType.ordinal,
                         nextPage = nextPage,
                         lastUpdated = System.currentTimeMillis()
                     )
                 )
                 val movieEntities = movieListResponse.results.map {
-                    when(remoteKeyType) {
-                        RemoteKeyType.PopularMovies -> it.toMovieEntity(isPopular = true)
-                        RemoteKeyType.TopRatedMovies -> it.toMovieEntity(isTopRated = true)
-                        RemoteKeyType.UpcomingMovies -> it.toMovieEntity(isUpcoming = true)
+                    when(movieListType) {
+                        MovieListType.PopularMovies -> it.toMovieEntity(isPopular = true)
+                        MovieListType.TopRatedMovies -> it.toMovieEntity(isTopRated = true)
+                        MovieListType.UpcomingMovies -> it.toMovieEntity(isUpcoming = true)
                     }
                 }
                 movieDatabase.movieDao.upsertMovies(movieEntities)
