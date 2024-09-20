@@ -52,8 +52,8 @@ class MovieRemoteMediator(
             Log.d(MovieRemoteMediator::class.simpleName, "Current page: $page")
             val movieListResponse = when (movieListType) {
                 MovieListType.PopularMovies -> tmdbApi.getPopularMovies(page = page)
-                MovieListType.TopRatedMovies -> tmdbApi.getPopularMovies(page = page)
-                MovieListType.UpcomingMovies -> tmdbApi.getPopularMovies(page = page)
+                MovieListType.TopRatedMovies -> tmdbApi.getTopRatedMovies(page = page)
+                MovieListType.UpcomingMovies -> tmdbApi.getUpcomingMovies(page = page)
             }
 
             val nextPage = if (movieListResponse.results.isNotEmpty()) page + 1 else null

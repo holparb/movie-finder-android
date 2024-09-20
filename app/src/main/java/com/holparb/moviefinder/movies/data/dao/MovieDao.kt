@@ -20,7 +20,7 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE is_popular")
     fun getPopularMoviesWithPagination(): PagingSource<Int, MovieEntity>
 
-    @Query("SELECT * FROM movies WHERE is_top_rated")
+    @Query("SELECT * FROM movies WHERE is_top_rated ORDER BY rating DESC")
     fun getTopRatedMoviesWithPagination(): PagingSource<Int, MovieEntity>
 
     @Query("SELECT * FROM movies WHERE is_upcoming")

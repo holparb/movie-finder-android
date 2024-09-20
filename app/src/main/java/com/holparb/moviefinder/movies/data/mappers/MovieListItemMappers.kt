@@ -24,6 +24,7 @@ fun MovieListItemDto.toMovieEntity(isPopular: Boolean = false, isTopRated: Boole
         title = this.title,
         overview = this.overview,
         releaseDate = this.releaseDate,
+        rating = this.rating,
         posterPath = if(!this.posterPath.isNullOrEmpty()) TmdbApi.IMAGE_URL_W500.plus(this.posterPath) else null,
         backdropPath = if(!this.backdropPath.isNullOrEmpty()) TmdbApi.IMAGE_URL_W780.plus(this.backdropPath) else null,
         genreIds = this.genreIds,

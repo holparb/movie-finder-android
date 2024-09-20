@@ -18,5 +18,7 @@ data class MovieListItemDto(
     @field:Json(name = "release_date")
     val releaseDate: String?,
     @field:Json(name = "genre_ids")
-    val genreIds: List<Int>
+    val genreIds: List<Int>,
+    @field:Json(name = "vote_average")
+    val rating: Double
 )
