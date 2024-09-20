@@ -1,7 +1,7 @@
 package com.holparb.moviefinder.movies.data.datasource.remote
 
 import com.holparb.moviefinder.BuildConfig
-import com.holparb.moviefinder.movies.data.dto.MovieListDto
+import com.holparb.moviefinder.movies.data.dto.MovieListResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
@@ -12,25 +12,25 @@ interface TmdbApi {
         @Query("page") page: Int = 1,
         @Query("region") region: String = "US",
         @Header("Authorization") authHeader: String = "Bearer ${BuildConfig.API_ACCESS_TOKEN}"
-    ): MovieListDto
+    ): MovieListResponseDto
 
     @GET("3/movie/top_rated")
     suspend fun getTopRatedMovies(
         @Query("page") page: Int = 1,
         @Query("region") region: String = "US",
         @Header("Authorization") authHeader: String = "Bearer ${BuildConfig.API_ACCESS_TOKEN}"
-    ): MovieListDto
+    ): MovieListResponseDto
 
     @GET("3/movie/upcoming")
     suspend fun getUpcomingMovies(
         @Query("page") page: Int = 1,
         @Query("region") region: String = "US",
         @Header("Authorization") authHeader: String = "Bearer ${BuildConfig.API_ACCESS_TOKEN}"
-    ): MovieListDto
+    ): MovieListResponseDto
 
     companion object {
-        val BASE_URL: String = "https://api.themoviedb.org/"
-        val IMAGE_URL_W500: String = "https://image.tmdb.org/t/p/w500"
-        val IMAGE_URL_W780: String = "https://image.tmdb.org/t/p/w780"
+        const val BASE_URL: String = "https://api.themoviedb.org/"
+        const val IMAGE_URL_W500: String = "https://image.tmdb.org/t/p/w500"
+        const val IMAGE_URL_W780: String = "https://image.tmdb.org/t/p/w780"
     }
 }

@@ -3,6 +3,7 @@ package com.holparb.moviefinder.di
 import android.content.Context
 import androidx.room.Room
 import com.holparb.moviefinder.movies.data.dao.MovieDao
+import com.holparb.moviefinder.movies.data.dao.RemoteKeyDao
 import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.repository.MovieRepositoryImpl
@@ -40,11 +41,17 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideRemoteKeyDao(movieDatabase: MovieDatabase): RemoteKeyDao {
+        return movieDatabase.remoteKeyDao
+    }
+
+    @Provides
+    @Singleton
     fun provideLocalDatabase(@ApplicationContext appContext: Context): MovieDatabase {
         return Room.databaseBuilder(
             appContext,
             MovieDatabase::class.java,
-            name = "movie-database"
+            name = "movie-database.db"
         ).build()
     }
 }

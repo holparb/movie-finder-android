@@ -18,5 +18,11 @@ data class MovieEntity (
     val runtime: Int? = null,
     val rating: Double? = null,
     @ColumnInfo(name = "genre_ids") val genreIds: List<Int>,
-    val details: Boolean = false
+    val details: Boolean = false,
+    @ColumnInfo(name = "is_popular")
+    val isPopular: Boolean = false,
+    @ColumnInfo(name = "is_top_rated")
+    val isTopRated: Boolean = false,
+    @ColumnInfo(name = "is_upcoming")
+    val isUpcoming: Boolean = false
 )

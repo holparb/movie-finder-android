@@ -1,31 +1,51 @@
 package com.holparb.moviefinder.movies.data.repository
 
 import android.util.Log
+import androidx.paging.Pager
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.holparb.moviefinder.movies.data.dao.MovieDao
+import com.holparb.moviefinder.movies.data.datasource.remote.MovieListType
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
-import com.holparb.moviefinder.movies.data.dto.MovieListDto
+import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.movies.domain.util.Resource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Named
 
 class MovieRepositoryImpl @Inject constructor (
     private val api: TmdbApi,
-    private val dao: MovieDao
+    private val movieDao: MovieDao,
+    @Named("PopularMoviesPager") private val popularMoviesPager: Pager<Int, MovieEntity>,
+    @Named("TopRatedMoviesPager") private val topRatedMoviesPager: Pager<Int, MovieEntity>,
+    @Named("UpcomingMoviesPager") private val upcomingMoviesPager: Pager<Int, MovieEntity>
 ): MovieRepository {
 
     private suspend fun getMovies(
         page: Int,
         region: String,
-        apiFunction: suspend TmdbApi.(page: Int, region: String) -> MovieListDto
+        movieListType: MovieListType,
     ): Resource<List<MovieListItem>, MovieError.NetworkError> {
         return try {
+            val results = when(movieListType) {
+                MovieListType.PopularMovies -> api.getPopularMovies(page = page, region = region).results
+                MovieListType.TopRatedMovies -> api.getTopRatedMovies(page = page, region = region).results
+                MovieListType.UpcomingMovies -> api.getUpcomingMovies(page = page, region = region).results
+            }
             Resource.Success(
-                api.apiFunction(page, region).results.map { movieListItemDto ->
-                    dao.upsertMovie(movieListItemDto.toMovieEntity())
+                results.map { movieListItemDto ->
+                    val movieEntity = when(movieListType) {
+                        MovieListType.PopularMovies -> movieListItemDto.toMovieEntity(isPopular = true)
+                        MovieListType.TopRatedMovies -> movieListItemDto.toMovieEntity(isTopRated = true)
+                        MovieListType.UpcomingMovies -> movieListItemDto.toMovieEntity(isUpcoming = true)
+                    }
+                    movieDao.upsertMovie(movieEntity)
                     movieListItemDto.toMovieListItem()
                 }
             )
@@ -38,15 +58,35 @@ class MovieRepositoryImpl @Inject constructor (
         }
     }
 
+    private fun getMoviesWithPagination(pager: Pager<Int, MovieEntity>): Flow<PagingData<MovieListItem>> {
+        return pager.flow.map { pagingData ->
+            pagingData.map {
+                it.toMovieListItem()
+            }
+        }
+    }
+
     override suspend fun getPopularMovies(
         page: Int,
         region: String
     ): Resource<List<MovieListItem>, MovieError.NetworkError> {
         return getMovies(
-            apiFunction = { _, _ -> api.getPopularMovies(page, region) },
+            movieListType = MovieListType.PopularMovies,
             page = page,
             region = region
         )
+    }
+
+    override suspend fun getPopularMoviesWithPagination(): Flow<PagingData<MovieListItem>> {
+        return getMoviesWithPagination(popularMoviesPager)
+    }
+
+    override suspend fun getTopRatedMoviesWithPagination(): Flow<PagingData<MovieListItem>> {
+        return getMoviesWithPagination(topRatedMoviesPager)
+    }
+
+    override suspend fun getUpcomingWithPagination(): Flow<PagingData<MovieListItem>> {
+        return getMoviesWithPagination(upcomingMoviesPager)
     }
 
     override suspend fun getTopRatedMovies(
@@ -54,7 +94,7 @@ class MovieRepositoryImpl @Inject constructor (
         region: String
     ): Resource<List<MovieListItem>, MovieError.NetworkError> {
         return getMovies(
-            apiFunction = { _, _ -> api.getTopRatedMovies(page, region) },
+            movieListType = MovieListType.TopRatedMovies,
             page = page,
             region = region
         )
@@ -65,7 +105,7 @@ class MovieRepositoryImpl @Inject constructor (
         region: String
     ): Resource<List<MovieListItem>, MovieError.NetworkError> {
         return getMovies(
-            apiFunction = { _, _ -> api.getUpcomingMovies(page, region) },
+            movieListType = MovieListType.UpcomingMovies,
             page = page,
             region = region
         )

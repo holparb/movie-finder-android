@@ -1,13 +1,12 @@
 package com.holparb.moviefinder.movies.presentation.components.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.holparb.moviefinder.movies.presentation.events.MovieListLoadEvent
 import com.holparb.moviefinder.movies.presentation.screens.HomeScreen
 import com.holparb.moviefinder.movies.presentation.screens.SeeMoreScreen
@@ -25,11 +24,7 @@ fun Navigation(navController: NavHostController) {
             typeMap = mapOf(typeOf<MovieListLoadEvent>() to MovieListLoadEventType)
         ) { backStackEntry ->
             val args = backStackEntry.toRoute<SeeMoreScreenComposable>()
-            val movieListViewModel = hiltViewModel<MovieListViewModel>()
-            val movieListState by movieListViewModel.state.collectAsStateWithLifecycle()
             SeeMoreScreen(
-                state = movieListState,
-                onEvent = movieListViewModel::onEvent,
                 title = args.title,
                 loadEvent = args.loadEvent,
                 onBack = { navController.popBackStack() }
