@@ -11,6 +11,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
@@ -34,14 +35,65 @@ class TmdbApiClass {
     }
 
     @Test
-    fun movies_list_fetched_correctly(): Unit = runBlocking {
+    fun popular_movies_list_fetched_correctly(): Unit = runBlocking {
         val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
-        mockResponse.setResponseCode(200).setBody(JsonReader.readJsonFile("MovieListResponse.json"))
+            .setResponseCode(200).setBody(JsonReader.readJsonFile("MovieListResponse.json"))
         server.enqueue(mockResponse)
 
         val result = api.getPopularMovies()
 
         Assert.assertNotNull(result)
         Assert.assertEquals(20, result.results.size)
+    }
+
+    @Test(expected = HttpException::class)
+    fun popular_movies_fetch_was_not_successful(): Unit = runBlocking {
+        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
+            .setResponseCode(400).setBody("Bad request")
+        server.enqueue(mockResponse)
+
+        api.getPopularMovies()
+    }
+
+    @Test
+    fun top_rated_movies_list_fetched_correctly(): Unit = runBlocking {
+        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
+            .setResponseCode(200).setBody(JsonReader.readJsonFile("MovieListResponse.json"))
+        server.enqueue(mockResponse)
+
+        val result = api.getTopRatedMovies()
+
+        Assert.assertNotNull(result)
+        Assert.assertEquals(20, result.results.size)
+    }
+
+    @Test(expected = HttpException::class)
+    fun top_rated_movies_fetch_was_not_successful(): Unit = runBlocking {
+        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
+            .setResponseCode(400).setBody("Bad request")
+        server.enqueue(mockResponse)
+
+        api.getTopRatedMovies()
+    }
+
+    @Test
+    fun upcoming_movies_list_fetched_correctly(): Unit = runBlocking {
+        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
+            .setResponseCode(200).setBody(JsonReader.readJsonFile("MovieListResponse.json"))
+        server.enqueue(mockResponse)
+
+        val result = api.getUpcomingMovies()
+
+        Assert.assertNotNull(result)
+        Assert.assertEquals(20, result.results.size)
+    }
+
+    @Test(expected = HttpException::class)
+    fun upcoming_movies_fetch_was_not_successful(): Unit = runBlocking {
+        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
+            .setResponseCode(400).setBody("Bad request")
+        server.enqueue(mockResponse)
+
+        api.getUpcomingMovies()
     }
 }
