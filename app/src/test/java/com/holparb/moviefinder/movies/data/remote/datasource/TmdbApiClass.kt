@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movie.data.datasource.remote
+package com.holparb.moviefinder.movies.data.remote.datasource
 
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.testutils.JsonReader
