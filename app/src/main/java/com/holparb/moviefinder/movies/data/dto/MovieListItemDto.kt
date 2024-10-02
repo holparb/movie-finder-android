@@ -12,13 +12,13 @@ data class MovieListItemDto(
     @field:Json(name = "overview")
     val overview: String,
     @field:Json(name = "poster_path")
-    val posterPath: String?,
+    val posterPath: String? = null,
     @field:Json(name = "backdrop_path")
-    val backdropPath: String?,
+    val backdropPath: String? = null,
     @field:Json(name = "release_date")
     val releaseDate: String?,
     @field:Json(name = "genre_ids")
     val genreIds: List<Int>,
     @field:Json(name = "vote_average")
-    val rating: Double
+    val rating: Double?
 )
