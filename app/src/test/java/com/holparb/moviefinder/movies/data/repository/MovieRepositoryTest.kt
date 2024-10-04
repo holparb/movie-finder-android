@@ -1,16 +1,19 @@
 package com.holparb.moviefinder.movies.data.repository
 
+import android.util.Log
 import androidx.paging.Pager
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
-import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.movies.domain.util.Resource
 import com.holparb.moviefinder.testutils.JsonReader
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -47,6 +50,8 @@ class MovieRepositoryTest {
             topRatedMoviesPager = mockPager,
             upcomingMoviesPager = mockPager
         )
+        mockkStatic(Log::class)
+        every { Log.e(any(), any<String>()) } returns 0
     }
 
     @After
@@ -56,13 +61,41 @@ class MovieRepositoryTest {
     }
 
     @Test
-    fun getPopularMovies_returns_movies_successfully() = runBlocking {
+    fun getPopularMovies_returns_movies_successfully(): Unit = runBlocking {
         val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
             .setResponseCode(200).setBody(JsonReader.readJsonFile("MovieListResponse.json"))
         server.enqueue(mockResponse)
+        coEvery { movieDao.upsertMovie(any<MovieEntity>()) } returns Unit
 
-        val result: Resource<List<MovieListItem>, MovieError.NetworkError> = repository.getPopularMovies()
+        val result = repository.getPopularMovies()
 
         Assert.assertTrue(result is Resource.Success)
+        Assert.assertEquals(20, (result as Resource.Success).data.size)
+    }
+
+    @Test
+    fun getPopularMovies_returns_fails_because_of_http_exception(): Unit = runBlocking {
+        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
+            .setResponseCode(400).setBody("Invalid")
+        server.enqueue(mockResponse)
+        coEvery { movieDao.upsertMovie(any<MovieEntity>()) } returns Unit
+
+        val result = repository.getPopularMovies()
+
+        Assert.assertTrue(result is Resource.Error)
+        Assert.assertTrue((result as Resource.Error).error is MovieError.NetworkError)
+    }
+
+    @Test
+    fun getPopularMovies_returns_fails_because_of_database_exception(): Unit = runBlocking {
+        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
+            .setResponseCode(200).setBody(JsonReader.readJsonFile("MovieListResponse.json"))
+        server.enqueue(mockResponse)
+        coEvery { movieDao.upsertMovie(any<MovieEntity>()) } throws Exception()
+
+        val result = repository.getPopularMovies()
+
+        Assert.assertTrue(result is Resource.Error)
+        Assert.assertTrue((result as Resource.Error).error is MovieError.LocalDatabaseError)
     }
 }
