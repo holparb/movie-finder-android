@@ -26,8 +26,11 @@ fun HomeScreen(
     val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
     val scrollState = rememberScrollState()
     val state by homeScreenViewModel.state.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
-        homeScreenViewModel.loadHomeScreenContent()
+        homeScreenViewModel.loadPopularMoviesAndMainItem()
+        homeScreenViewModel.loadTopRatedMovies()
+        homeScreenViewModel.loadUpcomingMovies()
     }
 
     Column(

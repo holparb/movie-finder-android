@@ -45,12 +45,11 @@ class MovieRepositoryImpl @Inject constructor (
                         saveMovieDtoToDatabase(movieListItemDto, movieListType)
                     }
                     catch (e: Exception) {
-                        return Resource.Error(error = MovieError.LocalDatabaseError("There was an error during caching data"))
+                        Resource.Error(error = MovieError.LocalDatabaseError("There was an error during caching data"))
                     }
                     movieListItemDto.toMovieListItem()
                 }
             )
-
         }
         catch(e: Exception) {
             Log.e(this::class.simpleName, e.localizedMessage ?: "Unknown error")

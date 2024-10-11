@@ -1,15 +1,14 @@
 package com.holparb.moviefinder.movies.presentation.viewmodels
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.movies.domain.util.Resource
-import com.holparb.moviefinder.movies.presentation.events.MovieListLoadEvent
 import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 import com.holparb.moviefinder.movies.presentation.states.HomeScreenState
-import com.holparb.moviefinder.movies.presentation.states.MovieListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,22 +24,16 @@ class HomeScreenViewModel @Inject constructor(
     private val _state = MutableStateFlow(HomeScreenState())
     val state = _state.asStateFlow()
 
+    @VisibleForTesting
     private fun updateMovieListState(key: String, newValue: DataLoadState<List<MovieListItem>, MovieError>) {
         val newMap = _state.value.movieLists.toMutableMap()
-        newMap[key] = MovieListState(movieList = newValue, loadEvent = resolveEventType(key))
-        _state.update {
-            it.copy(
-                movieLists = newMap.toMap()
-            )
-        }
-    }
-
-    private fun resolveEventType(key: String): MovieListLoadEvent {
-        return when(key) {
-            HomeScreenState.POPULAR_MOVIES -> MovieListLoadEvent.LoadPopularMovies
-            HomeScreenState.TOP_RATED_MOVIES -> MovieListLoadEvent.LoadTopRatedMovies
-            HomeScreenState.UPCOMING_MOVIES -> MovieListLoadEvent.LoadUpcomingMovies
-            else -> MovieListLoadEvent.Unknown
+        newMap[key]?.let {
+            newMap[key] = it.copy(movieList = newValue)
+            _state.update { homeScreenState ->
+                homeScreenState.copy(
+                    movieLists = newMap.toMap()
+                )
+            }
         }
     }
 
@@ -58,7 +51,7 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun loadPopularMoviesAndMainItem() {
+    fun loadPopularMoviesAndMainItem() {
         viewModelScope.launch {
             updateMovieListState(HomeScreenState.POPULAR_MOVIES, DataLoadState.Loading)
             updateMovieListState(HomeScreenState.MAIN_ITEM, DataLoadState.Loading)
@@ -68,15 +61,7 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun loadPopularMovies() {
-        viewModelScope.launch {
-            updateMovieListState(HomeScreenState.POPULAR_MOVIES, DataLoadState.Loading)
-            val result = repository.getPopularMovies()
-            updateMovieListStateBasedOnResult(HomeScreenState.POPULAR_MOVIES, result)
-        }
-    }
-
-    private fun loadTopRatedMovies() {
+    fun loadTopRatedMovies() {
         viewModelScope.launch {
             updateMovieListState(HomeScreenState.TOP_RATED_MOVIES, DataLoadState.Loading)
             val result = repository.getTopRatedMovies()
@@ -84,17 +69,11 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun loadUpcomingMovies() {
+    fun loadUpcomingMovies() {
         viewModelScope.launch {
             updateMovieListState(HomeScreenState.UPCOMING_MOVIES, DataLoadState.Loading)
             val result = repository.getUpcomingMovies()
             updateMovieListStateBasedOnResult(HomeScreenState.UPCOMING_MOVIES, result)
         }
-    }
-
-    fun loadHomeScreenContent() {
-        loadPopularMoviesAndMainItem()
-        loadTopRatedMovies()
-        loadUpcomingMovies()
     }
 }
