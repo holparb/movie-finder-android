@@ -7,6 +7,7 @@ import androidx.paging.map
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.MovieListType
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
+import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
@@ -31,8 +32,8 @@ class MovieRepositoryImpl @Inject constructor (
         page: Int,
         region: String,
         movieListType: MovieListType,
-    ): Resource<List<MovieListItem>, MovieError.NetworkError> {
-        return try {
+    ): Resource<List<MovieListItem>, MovieError> {
+       return try {
             val results = when(movieListType) {
                 MovieListType.PopularMovies -> api.getPopularMovies(page = page, region = region).results
                 MovieListType.TopRatedMovies -> api.getTopRatedMovies(page = page, region = region).results
@@ -40,12 +41,12 @@ class MovieRepositoryImpl @Inject constructor (
             }
             Resource.Success(
                 results.map { movieListItemDto ->
-                    val movieEntity = when(movieListType) {
-                        MovieListType.PopularMovies -> movieListItemDto.toMovieEntity(isPopular = true)
-                        MovieListType.TopRatedMovies -> movieListItemDto.toMovieEntity(isTopRated = true)
-                        MovieListType.UpcomingMovies -> movieListItemDto.toMovieEntity(isUpcoming = true)
+                    try {
+                        saveMovieDtoToDatabase(movieListItemDto, movieListType)
                     }
-                    movieDao.upsertMovie(movieEntity)
+                    catch (e: Exception) {
+                        Resource.Error(error = MovieError.LocalDatabaseError("There was an error during caching data"))
+                    }
                     movieListItemDto.toMovieListItem()
                 }
             )
@@ -56,6 +57,15 @@ class MovieRepositoryImpl @Inject constructor (
                 error = MovieError.NetworkError("Couldn't fetch movie data, please try again!")
             )
         }
+    }
+
+    private suspend fun saveMovieDtoToDatabase(movieListItemDto: MovieListItemDto, movieListType: MovieListType) {
+        val entity = when(movieListType) {
+            MovieListType.PopularMovies -> movieListItemDto.toMovieEntity(isPopular = true)
+            MovieListType.TopRatedMovies -> movieListItemDto.toMovieEntity(isTopRated = true)
+            MovieListType.UpcomingMovies -> movieListItemDto.toMovieEntity(isUpcoming = true)
+        }
+        movieDao.upsertMovie(entity)
     }
 
     private fun getMoviesWithPagination(pager: Pager<Int, MovieEntity>): Flow<PagingData<MovieListItem>> {
@@ -69,7 +79,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getPopularMovies(
         page: Int,
         region: String
-    ): Resource<List<MovieListItem>, MovieError.NetworkError> {
+    ): Resource<List<MovieListItem>, MovieError> {
         return getMovies(
             movieListType = MovieListType.PopularMovies,
             page = page,
@@ -92,7 +102,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getTopRatedMovies(
         page: Int,
         region: String
-    ): Resource<List<MovieListItem>, MovieError.NetworkError> {
+    ): Resource<List<MovieListItem>, MovieError> {
         return getMovies(
             movieListType = MovieListType.TopRatedMovies,
             page = page,
@@ -103,7 +113,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getUpcomingMovies(
         page: Int,
         region: String
-    ): Resource<List<MovieListItem>, MovieError.NetworkError> {
+    ): Resource<List<MovieListItem>, MovieError> {
         return getMovies(
             movieListType = MovieListType.UpcomingMovies,
             page = page,
