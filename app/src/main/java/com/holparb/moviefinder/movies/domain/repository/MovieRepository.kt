@@ -3,7 +3,7 @@ package com.holparb.moviefinder.movies.domain.repository
 import androidx.paging.PagingData
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.util.MovieError
-import com.holparb.moviefinder.movies.domain.util.Resource
+import com.holparb.moviefinder.core.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {

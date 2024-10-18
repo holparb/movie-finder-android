@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.holparb.moviefinder.core.utils.TestTags
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.movies.presentation.components.MoviePosterPicture
 import com.holparb.moviefinder.movies.presentation.components.navigation.SeeMoreScreenComposable
@@ -65,17 +67,18 @@ fun MovieHorizontalList(
                 CircularProgressIndicator(
                     modifier = Modifier
                         .width(64.dp)
-                        .align(Alignment.CenterHorizontally),
+                        .align(Alignment.CenterHorizontally)
+                        .testTag(TestTags.MOVIE_HORIZONTAL_LIST_LOADING),
                     color = MaterialTheme.colorScheme.onBackground,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             }
             is DataLoadState.Loaded -> {
                 LazyRow(
+                    modifier = Modifier.testTag(TestTags.MOVIE_HORIZONTAL_LIST_ITEMS),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     items(state.movieList.data) { item ->
-
                         MoviePosterPicture(
                             movie = item,
                             modifier = Modifier
