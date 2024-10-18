@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.holparb.moviefinder.movies.domain.model.MovieListItem
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError
-import com.holparb.moviefinder.movies.domain.util.Resource
+import com.holparb.moviefinder.core.utils.Resource
 import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 import com.holparb.moviefinder.movies.presentation.states.HomeScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel

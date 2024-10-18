@@ -7,7 +7,7 @@ import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError
-import com.holparb.moviefinder.movies.domain.util.Resource
+import com.holparb.moviefinder.core.utils.Resource
 import com.holparb.moviefinder.testutils.JsonReader
 import io.mockk.clearAllMocks
 import io.mockk.coEvery

@@ -21,7 +21,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.holparb.moviefinder.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -79,11 +79,14 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.turbine)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.mockwebserver)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
+
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
