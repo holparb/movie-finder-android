@@ -6,10 +6,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
-import com.holparb.moviefinder.core.utils.TestTags
+import com.holparb.moviefinder.core.presentation.util.TestTags
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.movies.presentation.states.DataLoadState
-import com.holparb.moviefinder.movies.presentation.states.MovieListState
+import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
+import com.holparb.moviefinder.movies.presentation.home_screen.components.MovieHorizontalList
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
 import org.junit.Rule
 import org.junit.Test

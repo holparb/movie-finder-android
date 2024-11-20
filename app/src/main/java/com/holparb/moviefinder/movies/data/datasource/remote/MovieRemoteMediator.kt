@@ -49,7 +49,6 @@ class MovieRemoteMediator(
                     }
                 }
             }
-            Log.d(MovieRemoteMediator::class.simpleName, "Current page: $page")
             val movieListResponse = when (movieListType) {
                 MovieListType.PopularMovies -> tmdbApi.getPopularMovies(page = page)
                 MovieListType.TopRatedMovies -> tmdbApi.getTopRatedMovies(page = page)

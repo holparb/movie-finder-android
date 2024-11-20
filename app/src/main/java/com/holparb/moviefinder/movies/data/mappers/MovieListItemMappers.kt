@@ -4,14 +4,14 @@ import android.util.Log
 import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
-import com.holparb.moviefinder.movies.domain.model.MovieListItem
+import com.holparb.moviefinder.movies.domain.model.Movie
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-fun MovieListItemDto.toMovieListItem(): MovieListItem {
+fun MovieListItemDto.toMovieListItem(): Movie {
 
     return try {
-        MovieListItem(
+        Movie(
             id = this.id,
             title = this.title,
             overview = this.overview,
@@ -21,7 +21,7 @@ fun MovieListItemDto.toMovieListItem(): MovieListItem {
         )
     }catch (e: Exception) {
         Log.e("MovieListItemDto.toMovieListItem()", e.message ?: "Unknown error")
-        MovieListItem(
+        Movie(
             id = this.id,
             title = this.title,
             overview = this.overview
@@ -45,9 +45,9 @@ fun MovieListItemDto.toMovieEntity(isPopular: Boolean = false, isTopRated: Boole
     )
 }
 
-fun MovieEntity.toMovieListItem(): MovieListItem {
+fun MovieEntity.toMovieListItem(): Movie {
     return try {
-        MovieListItem(
+        Movie(
             id = this.id,
             title = this.title,
             overview = this.overview,
@@ -57,7 +57,7 @@ fun MovieEntity.toMovieListItem(): MovieListItem {
         )
     }catch (e: Exception) {
         Log.e("MovieListItemDto.toMovieListItem()", e.message ?: "Unknown error")
-        MovieListItem(
+        Movie(
             id = this.id,
             title = this.title,
             overview = this.overview

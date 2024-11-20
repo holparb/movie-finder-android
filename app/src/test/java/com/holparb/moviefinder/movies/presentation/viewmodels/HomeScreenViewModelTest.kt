@@ -1,13 +1,14 @@
 package com.holparb.moviefinder.movies.presentation.viewmodels
 
 import app.cash.turbine.test
-import com.holparb.moviefinder.movies.domain.model.MovieListItem
+import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.core.utils.Resource
-import com.holparb.moviefinder.movies.presentation.events.MovieListLoadEvent
+import com.holparb.moviefinder.movies.presentation.home_screen.MovieListLoadEvent
+import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreenViewModel
 import com.holparb.moviefinder.movies.presentation.states.DataLoadState
-import com.holparb.moviefinder.movies.presentation.states.HomeScreenState
+import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreenState
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -33,12 +34,12 @@ import org.junit.runners.JUnit4
 class HomeScreenViewModelTest {
     private lateinit var repository: MovieRepository
     private lateinit var viewModel: HomeScreenViewModel
-    private val movies: List<MovieListItem> = listOf(
-        MovieListItem(id = 1, title = "title", overview = "overview"),
-        MovieListItem(id = 2, title = "title", overview = "overview"),
-        MovieListItem(id = 3, title = "title", overview = "overview"),
-        MovieListItem(id = 4, title = "title", overview = "overview"),
-        MovieListItem(id = 5, title = "title", overview = "overview")
+    private val movies: List<Movie> = listOf(
+        Movie(id = 1, title = "title", overview = "overview"),
+        Movie(id = 2, title = "title", overview = "overview"),
+        Movie(id = 3, title = "title", overview = "overview"),
+        Movie(id = 4, title = "title", overview = "overview"),
+        Movie(id = 5, title = "title", overview = "overview")
     )
     @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 
