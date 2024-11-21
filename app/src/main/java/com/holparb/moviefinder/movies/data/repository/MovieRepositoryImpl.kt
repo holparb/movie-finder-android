@@ -5,14 +5,15 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.holparb.moviefinder.core.domain.util.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
+import com.holparb.moviefinder.core.domain.util.map
 import com.holparb.moviefinder.movies.data.dao.MovieDao
-import com.holparb.moviefinder.movies.data.datasource.remote.MovieListType
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
 import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
+import com.holparb.moviefinder.movies.data.mappers.toMovie
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
-import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
 import com.holparb.moviefinder.movies.domain.model.Movie
+import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -38,7 +39,23 @@ class MovieRepositoryImpl @Inject constructor (
     private fun getMoviesWithPagination(pager: Pager<Int, MovieEntity>): Flow<PagingData<Movie>> {
         return pager.flow.map { pagingData ->
             pagingData.map {
-                it.toMovieListItem()
+                it.toMovie()
+            }
+        }
+    }
+
+    private suspend fun getMovies(
+        movieListType: MovieListType,
+        page: Int,
+        region: String
+    ): Result<List<Movie>, NetworkError> {
+        return moviesDataSource.getMoviesList(
+            movieListType = movieListType,
+            page = page,
+            region = region
+        ).map {
+            it.map { movieListItemDto ->
+                movieListItemDto.toMovie()
             }
         }
     }
@@ -47,7 +64,7 @@ class MovieRepositoryImpl @Inject constructor (
         page: Int,
         region: String
     ): Result<List<Movie>, NetworkError> {
-        return moviesDataSource.getMoviesList(
+        return getMovies(
             movieListType = MovieListType.PopularMovies,
             page = page,
             region = region
@@ -70,7 +87,7 @@ class MovieRepositoryImpl @Inject constructor (
         page: Int,
         region: String
     ): Result<List<Movie>, NetworkError> {
-        return moviesDataSource.getMoviesList(
+        return getMovies(
             movieListType = MovieListType.TopRatedMovies,
             page = page,
             region = region
@@ -81,7 +98,7 @@ class MovieRepositoryImpl @Inject constructor (
         page: Int,
         region: String
     ): Result<List<Movie>, NetworkError> {
-        return moviesDataSource.getMoviesList(
+        return getMovies(
             movieListType = MovieListType.UpcomingMovies,
             page = page,
             region = region

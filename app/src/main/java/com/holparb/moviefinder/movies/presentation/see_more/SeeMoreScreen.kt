@@ -22,19 +22,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.see_more.components.MovieVerticalList
-import com.holparb.moviefinder.movies.presentation.home_screen.MovieListLoadEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeeMoreScreen(
     title: String,
-    loadEvent: MovieListLoadEvent,
+    listType: MovieListType,
     onBack: () -> Unit
 ) {
     val movieListViewModel = hiltViewModel<MovieListViewModel>()
     LaunchedEffect(Unit) {
-        movieListViewModel.loadMovies(loadEvent)
+        movieListViewModel.loadMovies(listType)
     }
     val movies = movieListViewModel.pagingDataFlow.collectAsLazyPagingItems()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -76,5 +76,5 @@ fun SeeMoreScreen(
 @Preview
 @Composable
 private fun SeeMoreScreenPreview() {
-    SeeMoreScreen(title = "Movies", loadEvent = MovieListLoadEvent.Unknown, onBack = {})
+    SeeMoreScreen(title = "Movies", listType = MovieListType.PopularMovies, onBack = {})
 }

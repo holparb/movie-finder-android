@@ -37,7 +37,7 @@ fun HomeScreen(
             .verticalScroll(scrollState)
     ) {
         MainMovieItem(
-            dataLoadState = state.movieLists[HomeScreenState.MAIN_ITEM]?.movieList,
+            state = state.movieLists[HomeScreenState.MAIN_ITEM]!!,
             modifier = Modifier.height(280.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))

@@ -3,7 +3,6 @@ package com.holparb.moviefinder.movies.data.repository
 import android.util.Log
 import androidx.paging.Pager
 import com.holparb.moviefinder.movies.data.dao.MovieDao
-import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError

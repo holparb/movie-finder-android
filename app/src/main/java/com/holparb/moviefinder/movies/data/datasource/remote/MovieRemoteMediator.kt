@@ -6,16 +6,18 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
+import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.entity.RemoteKeyEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
+import com.holparb.moviefinder.movies.domain.model.MovieListType
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalPagingApi::class)
 class MovieRemoteMediator(
     private val movieDatabase: MovieDatabase,
-    private val tmdbApi: TmdbApi,
+    private val remoteMoviesDataSource: RemoteMoviesDataSource,
     private val movieListType: MovieListType
 ): RemoteMediator<Int, MovieEntity>() {
 
@@ -50,35 +52,41 @@ class MovieRemoteMediator(
                 }
             }
             val movieListResponse = when (movieListType) {
-                MovieListType.PopularMovies -> tmdbApi.getPopularMovies(page = page)
-                MovieListType.TopRatedMovies -> tmdbApi.getTopRatedMovies(page = page)
-                MovieListType.UpcomingMovies -> tmdbApi.getUpcomingMovies(page = page)
+                MovieListType.PopularMovies -> remoteMoviesDataSource.getMoviesList(movieListType = MovieListType.PopularMovies, page = page)
+                MovieListType.TopRatedMovies -> remoteMoviesDataSource.getMoviesList(movieListType = MovieListType.TopRatedMovies, page = page)
+                MovieListType.UpcomingMovies -> remoteMoviesDataSource.getMoviesList(movieListType = MovieListType.UpcomingMovies, page = page)
             }
 
-            val nextPage = if (movieListResponse.results.isNotEmpty()) page + 1 else null
+            when(movieListResponse) {
+                is Result.Error -> MediatorResult.Error(Exception("Movie data could not be fetched"))
+                is Result.Success -> {
+                    val nextPage = if (movieListResponse.data.isNotEmpty()) page + 1 else null
 
-            movieDatabase.withTransaction {
-                if(loadType == LoadType.REFRESH) {
-                    movieDatabase.movieDao.clearAll()
-                }
-                movieDatabase.remoteKeyDao.upsertRemoteKey(
-                    RemoteKeyEntity(
-                        id = movieListType.ordinal,
-                        nextPage = nextPage,
-                        lastUpdated = System.currentTimeMillis()
-                    )
-                )
-                val movieEntities = movieListResponse.results.map {
-                    when(movieListType) {
-                        MovieListType.PopularMovies -> it.toMovieEntity(isPopular = true)
-                        MovieListType.TopRatedMovies -> it.toMovieEntity(isTopRated = true)
-                        MovieListType.UpcomingMovies -> it.toMovieEntity(isUpcoming = true)
+                    movieDatabase.withTransaction {
+                        if(loadType == LoadType.REFRESH) {
+                            movieDatabase.movieDao.clearAll()
+                        }
+                        movieDatabase.remoteKeyDao.upsertRemoteKey(
+                            RemoteKeyEntity(
+                                id = movieListType.ordinal,
+                                nextPage = nextPage,
+                                lastUpdated = System.currentTimeMillis()
+                            )
+                        )
+                        val movieEntities = movieListResponse.data.map {
+                            when(movieListType) {
+                                MovieListType.PopularMovies -> it.toMovieEntity(isPopular = true)
+                                MovieListType.TopRatedMovies -> it.toMovieEntity(isTopRated = true)
+                                MovieListType.UpcomingMovies -> it.toMovieEntity(isUpcoming = true)
+                            }
+                        }
+                        movieDatabase.movieDao.upsertMovies(movieEntities)
                     }
+
+                    MediatorResult.Success(endOfPaginationReached = movieListResponse.data.isEmpty())
                 }
-                movieDatabase.movieDao.upsertMovies(movieEntities)
             }
 
-            MediatorResult.Success(endOfPaginationReached = movieListResponse.results.isEmpty())
         } catch (e: Exception) {
             Log.e(MovieRemoteMediator::class.simpleName, e.message.toString())
             MediatorResult.Error(e)

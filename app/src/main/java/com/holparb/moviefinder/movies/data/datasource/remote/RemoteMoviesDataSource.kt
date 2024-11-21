@@ -6,9 +6,9 @@ import com.holparb.moviefinder.core.data.networking.safeCall
 import com.holparb.moviefinder.core.domain.util.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.map
+import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.dto.MovieListResponseDto
-import com.holparb.moviefinder.movies.data.mappers.toMovieListItem
-import com.holparb.moviefinder.movies.domain.model.Movie
+import com.holparb.moviefinder.movies.domain.model.MovieListType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -24,7 +24,7 @@ class RemoteMoviesDataSource @Inject constructor(
         page: Int = 1,
         region: String = "US",
         authHeader: String = "Bearer ${BuildConfig.API_ACCESS_TOKEN}"
-    ): Result<List<Movie>, NetworkError> {
+    ): Result<List<MovieListItemDto>, NetworkError> {
         val urlString = when(movieListType) {
             MovieListType.PopularMovies -> constructUrl("/movie/popular")
             MovieListType.TopRatedMovies -> constructUrl("/movie/top_rated")
@@ -39,9 +39,7 @@ class RemoteMoviesDataSource @Inject constructor(
                 }
             }
         }.map {
-            it.results.map { movieListItemDto ->
-                movieListItemDto.toMovieListItem()
-            }
+            it.results
         }
     }
 

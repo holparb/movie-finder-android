@@ -1,13 +1,13 @@
 package com.holparb.moviefinder.movies.presentation.home_screen
 
-import com.holparb.moviefinder.movies.presentation.states.DataLoadState
+import com.holparb.moviefinder.movies.domain.model.MovieListType
 
 data class HomeScreenState(
     val movieLists: Map<String, MovieListState> = mapOf(
-        MAIN_ITEM to MovieListState(movieList = DataLoadState.Loading, loadEvent = MovieListLoadEvent.LoadPopularMovies),
-        POPULAR_MOVIES to MovieListState(movieList = DataLoadState.Loading, loadEvent = MovieListLoadEvent.LoadPopularMovies),
-        TOP_RATED_MOVIES to MovieListState(movieList = DataLoadState.Loading, loadEvent = MovieListLoadEvent.LoadTopRatedMovies),
-        UPCOMING_MOVIES to MovieListState(movieList = DataLoadState.Loading, loadEvent = MovieListLoadEvent.LoadUpcomingMovies)
+        MAIN_ITEM to MovieListState(movieListType = MovieListType.PopularMovies),
+        POPULAR_MOVIES to MovieListState(movieListType = MovieListType.PopularMovies),
+        TOP_RATED_MOVIES to MovieListState(movieListType = MovieListType.TopRatedMovies),
+        UPCOMING_MOVIES to MovieListState(movieListType = MovieListType.UpcomingMovies)
     ),
 ) {
     companion object {

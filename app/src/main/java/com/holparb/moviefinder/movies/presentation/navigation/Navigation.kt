@@ -5,8 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.holparb.moviefinder.movies.presentation.home_screen.MovieListLoadEvent
+import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreen
+import com.holparb.moviefinder.movies.presentation.home_screen.MovieListLoadEvent
 import com.holparb.moviefinder.movies.presentation.see_more.SeeMoreScreen
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
@@ -23,7 +24,7 @@ fun Navigation(navController: NavHostController) {
             val args = backStackEntry.toRoute<SeeMoreScreenComposable>()
             SeeMoreScreen(
                 title = args.title,
-                loadEvent = args.loadEvent,
+                listType = args.listType,
                 onBack = { navController.popBackStack() }
             )
         }
@@ -42,5 +43,5 @@ object SearchScreenComposable
 @Serializable
 data class SeeMoreScreenComposable(
     val title: String,
-    val loadEvent: MovieListLoadEvent
+    val listType: MovieListType
 )

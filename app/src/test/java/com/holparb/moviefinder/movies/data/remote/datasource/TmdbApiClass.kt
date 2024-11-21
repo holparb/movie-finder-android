@@ -1,6 +1,5 @@
 package com.holparb.moviefinder.movies.data.remote.datasource
 
-import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.testutils.JsonReader
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse

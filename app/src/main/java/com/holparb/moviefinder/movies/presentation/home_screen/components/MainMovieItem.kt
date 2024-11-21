@@ -21,98 +21,70 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.holparb.moviefinder.core.domain.util.NetworkError
 import com.holparb.moviefinder.movies.domain.model.Movie
+import com.holparb.moviefinder.movies.domain.model.MovieListType
+import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
 import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun MainMovieItem(
-    dataLoadState: DataLoadState<List<Movie>, NetworkError>?,
+    state: MovieListState,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier.fillMaxWidth()
     ) {
-        when(dataLoadState) {
-            is DataLoadState.Error -> {
+        if(state.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .width(64.dp)
+                    .align(Alignment.Center),
+                color = MaterialTheme.colorScheme.onBackground,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        }
+        state.movieList.first().let { mainItem ->
+            AsyncImage(
+                model = mainItem.backdropPath,
+                error = rememberVectorPainter(image = Icons.Sharp.Warning),
+                contentDescription = "movie poster",
+                contentScale = ContentScale.FillHeight,
+                modifier = modifier
+                    .fillMaxSize()
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black),
+                            startY = 500f
+                        )
+                    )
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .align(Alignment.BottomStart)
+            ) {
                 Text(
-                    text = "Item failed to load, please check your network connection and try again",
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        color = MaterialTheme.colorScheme.error
-                    ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center)
+                    text = mainItem.title ,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
-            }
-            DataLoadState.Loading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .width(64.dp)
-                        .align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-            }
-            is DataLoadState.Loaded -> {
-                AsyncImage(
-                    model = dataLoadState.data.first().backdropPath,
-                    error = rememberVectorPainter(image = Icons.Sharp.Warning),
-                    contentDescription = "movie poster",
-                    contentScale = ContentScale.FillHeight,
-                    modifier = modifier
-                        .fillMaxSize()
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black),
-                                startY = 500f
-                            )
-                        )
-                )
-                dataLoadState.data.first().let { mainItem ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .align(Alignment.BottomStart)
-                    ) {
-                        Text(
-                            text = mainItem.title ,
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = if(mainItem.releaseDate != null) mainItem.releaseDate.format(
-                                DateTimeFormatter.ofPattern("MMM dd, yyyy")) else "",
-                        )
-                    }
-                }
-            }
-
-            null -> {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Item failed to load, please check your network connection and try again",
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        color = MaterialTheme.colorScheme.error
-                    ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center)
+                    text = if(mainItem.releaseDate != null) mainItem.releaseDate.format(
+                        DateTimeFormatter.ofPattern("MMM dd, yyyy")) else "",
                 )
             }
         }
@@ -134,6 +106,6 @@ private fun MainMovieItemPreview(
     @PreviewParameter(provider = StateParameterProvider::class) state: DataLoadState<List<Movie>, NetworkError>
 ) {
     MovieFinderTheme {
-        MainMovieItem(dataLoadState = state, modifier = Modifier.height(300.dp))
+        MainMovieItem(state = MovieListState(movieListType = MovieListType.PopularMovies), modifier = Modifier.height(300.dp))
     }
 }

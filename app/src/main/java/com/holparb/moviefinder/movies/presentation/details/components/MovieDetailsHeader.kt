@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movies.presentation.details
+package com.holparb.moviefinder.movies.presentation.details.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

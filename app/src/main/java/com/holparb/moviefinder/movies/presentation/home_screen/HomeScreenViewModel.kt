@@ -4,9 +4,9 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.holparb.moviefinder.core.domain.util.NetworkError
+import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
-import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,10 +23,14 @@ class HomeScreenViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     @VisibleForTesting
-    private fun updateMovieListState(key: String, newValue: DataLoadState<List<Movie>, NetworkError>) {
+    private fun updateMovieListState(key: String, movies: List<Movie> = emptyList(), isLoading: Boolean) {
         val newMap = _state.value.movieLists.toMutableMap()
         newMap[key]?.let {
-            newMap[key] = it.copy(movieList = newValue)
+            if(isLoading) {
+                newMap[key] = it.copy(isLoading = true)
+            } else {
+                newMap[key] = it.copy(isLoading = false, movieList = movies)
+            }
             _state.update { homeScreenState ->
                 homeScreenState.copy(
                     movieLists = newMap.toMap()
@@ -37,22 +41,25 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun updateMovieListStateBasedOnResult(
         key: String,
-        result: Resource<List<Movie>, MovieError>
+        result: Result<List<Movie>, NetworkError>
     ) {
         when(result) {
-            is Resource.Error -> {
-                updateMovieListState(key, DataLoadState.Error(error = result.error))
+            is Result.Error -> {
+                updateMovieListState(key, isLoading = false)
             }
-            is Resource.Success -> {
-                updateMovieListState(key, DataLoadState.Loaded(data = result.data))
+            is Result.Success -> {
+                updateMovieListState(key, movies = result.data, isLoading = false)
             }
         }
     }
 
+
+
+
     fun loadPopularMoviesAndMainItem() {
         viewModelScope.launch {
-            updateMovieListState(HomeScreenState.POPULAR_MOVIES, DataLoadState.Loading)
-            updateMovieListState(HomeScreenState.MAIN_ITEM, DataLoadState.Loading)
+            updateMovieListState(HomeScreenState.POPULAR_MOVIES, isLoading = true)
+            updateMovieListState(HomeScreenState.MAIN_ITEM, isLoading = true)
             val result = repository.getPopularMovies()
             updateMovieListStateBasedOnResult(HomeScreenState.POPULAR_MOVIES, result)
             updateMovieListStateBasedOnResult(HomeScreenState.MAIN_ITEM, result)
@@ -61,7 +68,7 @@ class HomeScreenViewModel @Inject constructor(
 
     fun loadTopRatedMovies() {
         viewModelScope.launch {
-            updateMovieListState(HomeScreenState.TOP_RATED_MOVIES, DataLoadState.Loading)
+            updateMovieListState(HomeScreenState.TOP_RATED_MOVIES, isLoading = true)
             val result = repository.getTopRatedMovies()
             updateMovieListStateBasedOnResult(HomeScreenState.TOP_RATED_MOVIES, result)
         }
@@ -69,7 +76,7 @@ class HomeScreenViewModel @Inject constructor(
 
     fun loadUpcomingMovies() {
         viewModelScope.launch {
-            updateMovieListState(HomeScreenState.UPCOMING_MOVIES, DataLoadState.Loading)
+            updateMovieListState(HomeScreenState.UPCOMING_MOVIES, isLoading = true)
             val result = repository.getUpcomingMovies()
             updateMovieListStateBasedOnResult(HomeScreenState.UPCOMING_MOVIES, result)
         }
