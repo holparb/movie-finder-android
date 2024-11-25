@@ -16,9 +16,7 @@ fun Navigation(navController: NavHostController) {
         composable<HomeScreenComposable> {
             HomeScreen(navController = navController)
         }
-        composable<SeeMoreScreenComposable>(
-            //typeMap = mapOf(typeOf<MovieListTypeNavType>() to MovieListTypeNavType)
-        ) { backStackEntry ->
+        composable<SeeMoreScreenComposable> { backStackEntry ->
             val args = backStackEntry.toRoute<SeeMoreScreenComposable>()
             SeeMoreScreen(
                 title = args.title,
