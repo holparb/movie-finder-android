@@ -54,18 +54,19 @@ fun MovieHorizontalList(
                 color = MaterialTheme.colorScheme.onBackground,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
-        }
-        LazyRow(
-            modifier = Modifier.testTag(TestTags.MOVIE_HORIZONTAL_LIST_ITEMS),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            items(state.movieList) { item ->
-                MoviePosterPicture(
-                    movie = item,
-                    modifier = Modifier
-                        .width(120.dp)
-                        .height(180.dp)
-                )
+        } else {
+            LazyRow(
+                modifier = Modifier.testTag(TestTags.MOVIE_HORIZONTAL_LIST_ITEMS),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(state.movieList) { item ->
+                    MoviePosterPicture(
+                        movie = item,
+                        modifier = Modifier
+                            .width(120.dp)
+                            .height(180.dp)
+                    )
+                }
             }
         }
     }
@@ -82,7 +83,7 @@ class ListStateParameterProvider: PreviewParameterProvider<MovieListState> {
 @Preview
 @Composable
 private fun MovieHorizontalListPreview(
-    @PreviewParameter(provider = StateParameterProvider::class) state: MovieListState
+    @PreviewParameter(provider = ListStateParameterProvider::class) state: MovieListState
 ) {
     MovieHorizontalList(state = state, modifier = Modifier.height(250.dp), title = "Title", navController = rememberNavController())
 }

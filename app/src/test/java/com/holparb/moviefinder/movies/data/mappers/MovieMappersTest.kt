@@ -1,6 +1,7 @@
 package com.holparb.moviefinder.movies.data.mappers
 
 import android.util.Log
+import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
 import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.domain.model.Movie
@@ -76,7 +77,7 @@ class MovieMappersTest {
     @Test
     fun dto_mapped_to_model_correctly() {
         val dto = MovieListItemDto(id = 1, title = "title", overview = "overview", backdropPath = "/path", posterPath = "/path", genreIds = listOf(1,2,3), rating = 1.0, releaseDate = "1992-02-23")
-        val expectedModel = Movie(id = 1, title = "title", overview = "overview", backdropPath = TmdbApi.IMAGE_URL_W780 + "/path", posterPath = TmdbApi.IMAGE_URL_W500 + "/path", releaseDate = LocalDate.parse("1992-02-23", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+        val expectedModel = Movie(id = 1, title = "title", overview = "overview", backdropPath = RemoteMoviesDataSource.IMAGE_URL_W780 + "/path", posterPath = RemoteMoviesDataSource.IMAGE_URL_W500 + "/path", releaseDate = LocalDate.parse("1992-02-23", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
 
         Assert.assertEquals(expectedModel, dto.toMovie())
     }

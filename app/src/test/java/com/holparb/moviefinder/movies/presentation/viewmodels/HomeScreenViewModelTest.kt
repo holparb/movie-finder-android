@@ -5,7 +5,6 @@ import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieError
 import com.holparb.moviefinder.core.utils.Resource
-import com.holparb.moviefinder.movies.presentation.home_screen.MovieListLoadEvent
 import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreenViewModel
 import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreenState

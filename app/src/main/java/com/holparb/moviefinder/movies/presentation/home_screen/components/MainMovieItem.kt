@@ -23,15 +23,10 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.holparb.moviefinder.core.domain.util.NetworkError
-import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
-import com.holparb.moviefinder.movies.presentation.states.DataLoadState
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
 import java.time.format.DateTimeFormatter
 
@@ -52,59 +47,50 @@ fun MainMovieItem(
                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
         }
-        state.movieList.first().let { mainItem ->
-            AsyncImage(
-                model = mainItem.backdropPath,
-                error = rememberVectorPainter(image = Icons.Sharp.Warning),
-                contentDescription = "movie poster",
-                contentScale = ContentScale.FillHeight,
-                modifier = modifier
-                    .fillMaxSize()
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black),
-                            startY = 500f
+        else if (state.movieList.isNotEmpty()){
+            state.movieList.first().let { mainItem ->
+                AsyncImage(
+                    model = mainItem.backdropPath,
+                    error = rememberVectorPainter(image = Icons.Sharp.Warning),
+                    contentDescription = "movie poster",
+                    contentScale = ContentScale.FillHeight,
+                    modifier = modifier
+                        .fillMaxSize()
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, Color.Black),
+                                startY = 500f
+                            )
                         )
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.BottomStart)
+                ) {
+                    Text(
+                        text = mainItem.title ,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.BottomStart)
-            ) {
-                Text(
-                    text = mainItem.title ,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = if(mainItem.releaseDate != null) mainItem.releaseDate.format(
-                        DateTimeFormatter.ofPattern("MMM dd, yyyy")) else "",
-                )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = if(mainItem.releaseDate != null) mainItem.releaseDate.format(
+                            DateTimeFormatter.ofPattern("MMM dd, yyyy")) else "",
+                    )
+                }
             }
         }
     }
 }
 
-class StateParameterProvider: PreviewParameterProvider<DataLoadState<List<Movie>, NetworkError>> {
-    override val values: Sequence<DataLoadState<List<Movie>, NetworkError>>
-        get() = sequenceOf(
-            DataLoadState.Loading,
-            DataLoadState.Error(NetworkError.UNKNOWN),
-            DataLoadState.Loaded(emptyList())
-        )
-}
-
 @Preview(showBackground = true)
 @Composable
-private fun MainMovieItemPreview(
-    @PreviewParameter(provider = StateParameterProvider::class) state: DataLoadState<List<Movie>, NetworkError>
-) {
+private fun MainMovieItemPreview() {
     MovieFinderTheme {
         MainMovieItem(state = MovieListState(movieListType = MovieListType.PopularMovies), modifier = Modifier.height(300.dp))
     }
