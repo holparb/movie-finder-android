@@ -1,15 +1,20 @@
 package com.holparb.moviefinder.movies.presentation.home_screen
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.holparb.moviefinder.core.domain.util.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
+import com.holparb.moviefinder.core.domain.util.onError
+import com.holparb.moviefinder.core.domain.util.onSuccess
 import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,9 +25,20 @@ class HomeScreenViewModel @Inject constructor(
 ): ViewModel() {
 
     private val _state = MutableStateFlow(HomeScreenState())
-    val state = _state.asStateFlow()
+    val state = _state
+        .onStart {
+            loadPopularMoviesAndMainItem()
+            loadTopRatedMovies()
+            loadUpcomingMovies()
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            HomeScreenState()
+        )
 
-    @VisibleForTesting
+    private val _events = Channel<MovieListEvent>()
+    val events = _events.receiveAsFlow()
+
     private fun updateMovieListState(key: String, movies: List<Movie> = emptyList(), isLoading: Boolean) {
         val newMap = _state.value.movieLists.toMutableMap()
         newMap[key]?.let {
@@ -39,18 +55,18 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun updateMovieListStateBasedOnResult(
+    private suspend fun updateMovieListStateBasedOnResult(
         key: String,
         result: Result<List<Movie>, NetworkError>
     ) {
-        when(result) {
-            is Result.Error -> {
+        result
+            .onSuccess { movies ->
+                updateMovieListState(key, movies = movies, isLoading = false)
+            }
+            .onError { error ->
                 updateMovieListState(key, isLoading = false)
+                _events.send(MovieListEvent.Error(error))
             }
-            is Result.Success -> {
-                updateMovieListState(key, movies = result.data, isLoading = false)
-            }
-        }
     }
 
 

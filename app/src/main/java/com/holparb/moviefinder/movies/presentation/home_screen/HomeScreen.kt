@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.movies.presentation.home_screen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,13 +8,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.holparb.moviefinder.core.presentation.util.ObserveAsEvents
+import com.holparb.moviefinder.core.presentation.util.toString
 import com.holparb.moviefinder.movies.presentation.home_screen.components.MainMovieItem
 import com.holparb.moviefinder.movies.presentation.home_screen.components.MovieHorizontalList
 
@@ -24,11 +27,18 @@ fun HomeScreen(
     val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
     val scrollState = rememberScrollState()
     val state by homeScreenViewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        homeScreenViewModel.loadPopularMoviesAndMainItem()
-        homeScreenViewModel.loadTopRatedMovies()
-        homeScreenViewModel.loadUpcomingMovies()
+    ObserveAsEvents(events = homeScreenViewModel.events) { event ->
+        when(event) {
+            is MovieListEvent.Error -> {
+                Toast.makeText(
+                    context,
+                    event.error.toString(context),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     Column(
