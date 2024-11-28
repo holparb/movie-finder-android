@@ -19,10 +19,8 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.holparb.moviefinder.movies.presentation.main_screen.components.BottomNavigationBar
-import com.holparb.moviefinder.movies.presentation.navigation.HomeScreenComposable
+import com.holparb.moviefinder.movies.presentation.navigation.Destination
 import com.holparb.moviefinder.movies.presentation.navigation.Navigation
-import com.holparb.moviefinder.movies.presentation.navigation.SearchScreenComposable
-import com.holparb.moviefinder.movies.presentation.navigation.WatchlistComposable
 
 @Composable
 fun MainScreen() {
@@ -35,9 +33,9 @@ fun MainScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     navBackStackEntry?.destination?.let { currentDestination ->
-        bottomNavVisible = (currentDestination.hasRoute(HomeScreenComposable::class)
-                || currentDestination.hasRoute(WatchlistComposable::class)
-                || currentDestination.hasRoute(SearchScreenComposable::class))
+        bottomNavVisible = (currentDestination.hasRoute(Destination.HomeScreenComposable::class)
+                || currentDestination.hasRoute(Destination.WatchlistComposable::class)
+                || currentDestination.hasRoute(Destination.SearchScreenComposable::class))
     }
 
     Scaffold(

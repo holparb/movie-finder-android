@@ -24,7 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import com.holparb.moviefinder.core.presentation.util.TestTags
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
-import com.holparb.moviefinder.movies.presentation.navigation.SeeMoreScreenComposable
+import com.holparb.moviefinder.movies.presentation.navigation.Destination
 
 @Composable
 fun MovieHorizontalList(
@@ -41,7 +41,12 @@ fun MovieHorizontalList(
         SectionHeader(
             title = title,
             onClick = {
-                navController.navigate(SeeMoreScreenComposable(title = title, listType = state.movieListType))
+                navController.navigate(
+                    Destination.SeeMoreScreenComposable(
+                        title = title,
+                        listType = state.movieListType
+                    )
+                )
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
