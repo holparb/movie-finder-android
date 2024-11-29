@@ -2,6 +2,8 @@ package com.holparb.moviefinder.movies.presentation.home_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.holparb.moviefinder.core.domain.util.DatabaseError
+import com.holparb.moviefinder.core.domain.util.Error
 import com.holparb.moviefinder.core.domain.util.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.onError
@@ -37,7 +39,7 @@ class HomeScreenViewModel @Inject constructor(
     private val _events = Channel<MovieListEvent>()
     val events = _events.receiveAsFlow()
 
-    private var networkError: NetworkError? = null
+    private var _error: Error? = null
 
     private fun updateMovieListState(key: String, movies: List<Movie> = emptyList(), isLoading: Boolean) {
         val newMap = _state.value.movieLists.toMutableMap()
@@ -57,16 +59,16 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun updateMovieListStateBasedOnResult(
         key: String,
-        result: Result<List<Movie>, NetworkError>
+        result: Result<List<Movie>, Error>
     ) {
-        networkError = null
+        _error = null
         result
             .onSuccess { movies ->
                 updateMovieListState(key, movies = movies, isLoading = false)
             }
             .onError { error ->
                 updateMovieListState(key, isLoading = false)
-                networkError = error
+                _error = error
             }
     }
 
@@ -77,8 +79,12 @@ class HomeScreenViewModel @Inject constructor(
             loadTopRatedMovies()
             loadUpcomingMovies()
 
-            if(networkError != null) {
-                _events.send(MovieListEvent.Error(networkError!!))
+            if(_error != null) {
+                when(_error) {
+                    is NetworkError -> _events.send(MovieListEvent.RemoteError(_error as NetworkError))
+                    is DatabaseError -> _events.send(MovieListEvent.LocalError(_error as DatabaseError))
+                    else -> {}
+                }
             }
         }
     }

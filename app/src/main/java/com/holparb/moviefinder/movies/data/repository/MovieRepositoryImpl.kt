@@ -3,7 +3,7 @@ package com.holparb.moviefinder.movies.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.holparb.moviefinder.core.domain.util.NetworkError
+import com.holparb.moviefinder.core.domain.util.Error
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.map
 import com.holparb.moviefinder.movies.data.dao.MovieDao
@@ -48,7 +48,7 @@ class MovieRepositoryImpl @Inject constructor (
         movieListType: MovieListType,
         page: Int,
         region: String
-    ): Result<List<Movie>, NetworkError> {
+    ): Result<List<Movie>, Error> {
         return moviesDataSource.getMoviesList(
             movieListType = movieListType,
             page = page,
@@ -63,7 +63,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getPopularMovies(
         page: Int,
         region: String
-    ): Result<List<Movie>, NetworkError> {
+    ): Result<List<Movie>, Error> {
         return getMovies(
             movieListType = MovieListType.PopularMovies,
             page = page,
@@ -86,7 +86,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getTopRatedMovies(
         page: Int,
         region: String
-    ): Result<List<Movie>, NetworkError> {
+    ): Result<List<Movie>, Error> {
         return getMovies(
             movieListType = MovieListType.TopRatedMovies,
             page = page,
@@ -97,7 +97,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getUpcomingMovies(
         page: Int,
         region: String
-    ): Result<List<Movie>, NetworkError> {
+    ): Result<List<Movie>, Error> {
         return getMovies(
             movieListType = MovieListType.UpcomingMovies,
             page = page,

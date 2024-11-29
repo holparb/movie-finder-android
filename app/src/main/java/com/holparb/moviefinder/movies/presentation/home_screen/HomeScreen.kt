@@ -31,12 +31,16 @@ fun HomeScreen(
 
     ObserveAsEvents(events = homeScreenViewModel.events) { event ->
         when(event) {
-            is MovieListEvent.Error -> {
+            is MovieListEvent.RemoteError -> {
                 Toast.makeText(
                     context,
                     event.error.toString(context),
                     Toast.LENGTH_LONG
                 ).show()
+            }
+
+            is MovieListEvent.LocalError -> {
+
             }
         }
     }
