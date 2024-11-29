@@ -2,23 +2,20 @@ package com.holparb.moviefinder.movies.data.repository
 
 import android.util.Log
 import androidx.paging.Pager
-import com.holparb.moviefinder.core.data.networking.HttpClientFactory
 import com.holparb.moviefinder.core.domain.util.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
+import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
+import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
-import com.holparb.moviefinder.testutils.JsonReader
-import io.ktor.client.engine.cio.CIO
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import kotlinx.coroutines.runBlocking
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -29,15 +26,17 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class MovieRepositoryTest {
     private lateinit var dataSource: RemoteMoviesDataSource
-    private lateinit var server: MockWebServer
     private lateinit var movieDao: MovieDao
     private lateinit var repository: MovieRepository
     private lateinit var mockPager: Pager<Int, MovieEntity>
 
+    private val movieList = (1 .. 20).map { index ->
+        MovieListItemDto(id = index, title = "title", overview = "Some text here")
+    }
+
     @Before
     fun setup() {
-        server = MockWebServer()
-        dataSource = RemoteMoviesDataSource(HttpClientFactory.create(CIO.create()))
+        dataSource = mockk()
         movieDao = mockk()
         mockPager = mockk()
         repository = MovieRepositoryImpl(
@@ -53,15 +52,12 @@ class MovieRepositoryTest {
 
     @After
     fun tearDown() {
-        server.shutdown()
         clearAllMocks()
     }
 
     @Test
     fun getPopularMovies_returns_movies_successfully(): Unit = runBlocking {
-        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
-            .setResponseCode(200).setBody(JsonReader.readJsonFile("MovieListResponse.json"))
-        server.enqueue(mockResponse)
+        coEvery { dataSource.getMoviesList(movieListType = MovieListType.PopularMovies) } returns Result.Success(movieList)
         coEvery { movieDao.upsertMovie(any<MovieEntity>()) } returns Unit
 
         val result = repository.getPopularMovies()
@@ -72,22 +68,18 @@ class MovieRepositoryTest {
 
     @Test
     fun getPopularMovies_returns_fails_because_of_http_exception(): Unit = runBlocking {
-        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
-            .setResponseCode(400).setBody("Invalid")
-        server.enqueue(mockResponse)
+        coEvery { dataSource.getMoviesList(movieListType = MovieListType.PopularMovies) } returns Result.Error(NetworkError.SERVER_ERROR)
         coEvery { movieDao.upsertMovie(any<MovieEntity>()) } returns Unit
 
         val result = repository.getPopularMovies()
 
         Assert.assertTrue(result is Result.Error)
-        Assert.assertTrue((result as Result.Error).error is NetworkError)
+        Assert.assertTrue((result as Result.Error).error == NetworkError.SERVER_ERROR)
     }
 
     @Test
     fun getPopularMovies_returns_fails_because_of_database_exception(): Unit = runBlocking {
-        val mockResponse = MockResponse().addHeader("Content-Type", "application/json; charset=utf-8")
-            .setResponseCode(200).setBody(JsonReader.readJsonFile("MovieListResponse.json"))
-        server.enqueue(mockResponse)
+        coEvery { dataSource.getMoviesList(movieListType = MovieListType.PopularMovies) } returns Result.Success(movieList)
         coEvery { movieDao.upsertMovie(any<MovieEntity>()) } throws Exception()
 
         val result = repository.getPopularMovies()
