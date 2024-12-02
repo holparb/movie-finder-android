@@ -1,24 +1,21 @@
 package com.holparb.moviefinder.movies.data.dto
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class MovieListItemDto(
-    @field:Json(name = "id")
     val id: Int,
-    @field:Json(name = "title")
     val title: String,
-    @field:Json(name = "overview")
     val overview: String,
-    @field:Json(name = "poster_path")
+    @SerialName("poster_path")
     val posterPath: String? = null,
-    @field:Json(name = "backdrop_path")
+    @SerialName("backdrop_path")
     val backdropPath: String? = null,
-    @field:Json(name = "release_date")
+    @SerialName("release_date")
     val releaseDate: String? = null,
-    @field:Json(name = "genre_ids")
+    @SerialName("genre_ids")
     val genreIds: List<Int> = emptyList<Int>(),
-    @field:Json(name = "vote_average")
+    @SerialName("vote_average")
     val rating: Double? = null
 )

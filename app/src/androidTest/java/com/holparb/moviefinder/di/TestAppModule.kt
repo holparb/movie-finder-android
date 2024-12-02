@@ -5,7 +5,6 @@ import androidx.room.Room
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.dao.RemoteKeyDao
 import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
-import com.holparb.moviefinder.movies.data.datasource.remote.TmdbApi
 import com.holparb.moviefinder.movies.data.repository.MovieRepositoryImpl
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import dagger.Binds
@@ -14,9 +13,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
 @Module
@@ -25,12 +26,16 @@ object TestAppModule {
 
     @Provides
     @Singleton
-    fun provideTmdbApi(): TmdbApi {
-        return Retrofit.Builder()
-            .baseUrl(TmdbApi.BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create()
+    fun provideHttpClient(engine: HttpClientEngine): HttpClient {
+        return HttpClient(engine) {
+            install(ContentNegotiation) {
+                json(
+                    json = Json {
+                        ignoreUnknownKeys = true
+                    }
+                )
+            }
+        }
     }
 
     @Provides

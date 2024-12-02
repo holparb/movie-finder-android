@@ -1,12 +1,9 @@
 package com.holparb.moviefinder.movies.data.dto
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class MovieListResponseDto(
-    @field:Json(name = "page")
     val page: Int,
-    @field:Json(name = "results")
     val results: List<MovieListItemDto>
 )
