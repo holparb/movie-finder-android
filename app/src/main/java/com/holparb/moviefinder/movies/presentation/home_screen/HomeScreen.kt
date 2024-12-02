@@ -30,19 +30,15 @@ fun HomeScreen(
     val context = LocalContext.current
 
     ObserveAsEvents(events = homeScreenViewModel.events) { event ->
-        when(event) {
-            is MovieListEvent.RemoteError -> {
-                Toast.makeText(
-                    context,
-                    event.error.toString(context),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-
-            is MovieListEvent.LocalError -> {
-
-            }
+        val toastText = when(event) {
+            is MovieListEvent.RemoteError -> event.error.toString(context)
+            is MovieListEvent.LocalError -> event.error.toString(context)
         }
+        Toast.makeText(
+            context,
+            toastText,
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     Column(
