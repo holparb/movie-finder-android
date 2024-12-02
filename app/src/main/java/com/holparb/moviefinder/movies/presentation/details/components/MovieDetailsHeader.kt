@@ -22,26 +22,46 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.SubcomposeAsyncImage
 import com.holparb.moviefinder.R
+import com.holparb.moviefinder.movies.domain.model.Genre
+import com.holparb.moviefinder.movies.domain.model.Movie
+import com.holparb.moviefinder.movies.presentation.details.MovieDetailsUi
+import com.holparb.moviefinder.movies.presentation.details.toMovieDetailsUi
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
+import java.time.LocalDate
 
 @Composable
 fun MovieDetailsHeader(
+    movieDetailsUi: MovieDetailsUi,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier.fillMaxWidth()
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.test_backdrop_path),
+        SubcomposeAsyncImage(
+            model = movieDetailsUi.backdropPath,
+            error = {
+                val resId = if(LocalInspectionMode.current) {
+                    R.drawable.test_backdrop_path
+                } else {
+                    R.drawable.backdrop_path_error
+                }
+                Image(
+                    painter = painterResource(id = resId),
+                    contentDescription = null
+                )
+            },
             contentDescription = "Movie backdrop path",
             contentScale = ContentScale.FillHeight,
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
+
         )
         Box(
             modifier = Modifier
@@ -59,21 +79,21 @@ fun MovieDetailsHeader(
                 .align(Alignment.BottomStart)
         ) {
             Text(
-                text = "The Lord of the Rings: The Return of the King" ,
+                text = movieDetailsUi.title ,
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row {
                 Text(
-                    text = "2003"
+                    text = movieDetailsUi.releaseYear
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "Adventure"
+                    text = movieDetailsUi.genre
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "3h 2m"
+                    text = movieDetailsUi.runtime
                 )
             }
             Row {
@@ -96,6 +116,16 @@ fun MovieDetailsHeader(
 @Composable
 fun MovieDetailsHeaderPreview() {
     MovieFinderTheme {
-        MovieDetailsHeader(modifier = Modifier.height(400.dp))
+        MovieDetailsHeader(movieDetailsUi = previewMovie.toMovieDetailsUi(), modifier = Modifier.height(400.dp))
     }
 }
+
+internal val previewMovie = Movie(
+    id = 1,
+    title = "Movie Title",
+    overview = "This is an overview of a movie which is very good",
+    releaseDate = LocalDate.now(),
+    genres = listOf(Genre(id = 1, name = "Adventure")),
+    rating = 4.6,
+    runtime = 136
+)

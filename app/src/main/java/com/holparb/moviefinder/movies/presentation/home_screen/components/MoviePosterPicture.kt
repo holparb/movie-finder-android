@@ -3,12 +3,9 @@ package com.holparb.moviefinder.movies.presentation.home_screen.components
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.sharp.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -23,7 +20,6 @@ fun MoviePosterPicture(
 ) {
     AsyncImage(
         model = movie.posterPath,
-        error = rememberVectorPainter(image = Icons.Sharp.Warning),
         contentDescription = "movie poster",
         modifier = modifier
             .clip(Shapes.medium)
