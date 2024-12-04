@@ -1,6 +1,8 @@
 package com.holparb.moviefinder.movies.presentation.home_screen.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.sharp.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,12 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
+import com.holparb.moviefinder.R
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
@@ -36,7 +37,13 @@ fun MainMovieItem(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                enabled = state.isLoading.not() && state.movieList.isNotEmpty()
+            ) {
+
+            }
     ) {
         if(state.isLoading) {
             CircularProgressIndicator(
@@ -49,9 +56,8 @@ fun MainMovieItem(
         }
         else if (state.movieList.isNotEmpty()){
             state.movieList.first().let { mainItem ->
-                AsyncImage(
+                SubcomposeAsyncImage(
                     model = mainItem.backdropPath,
-                    error = rememberVectorPainter(image = Icons.Sharp.Warning),
                     contentDescription = "movie poster",
                     contentScale = ContentScale.FillHeight,
                     modifier = modifier
@@ -84,6 +90,14 @@ fun MainMovieItem(
                     )
                 }
             }
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.backdrop_path_error),
+                contentDescription = null,
+                contentScale = ContentScale.FillHeight,
+                modifier = modifier
+                    .fillMaxSize()
+            )
         }
     }
 }

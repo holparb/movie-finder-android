@@ -72,7 +72,6 @@ class HomeScreenViewModel @Inject constructor(
             }
     }
 
-
     fun loadHomeScreenContent() {
         viewModelScope.launch {
             loadPopularMoviesAndMainItem()
