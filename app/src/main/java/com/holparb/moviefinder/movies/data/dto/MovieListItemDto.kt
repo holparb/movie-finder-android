@@ -17,5 +17,6 @@ data class MovieListItemDto(
     @SerialName("genre_ids")
     val genreIds: List<Int> = emptyList<Int>(),
     @SerialName("vote_average")
-    val rating: Double? = null
+    val rating: Double? = null,
+    val popularity: Double = 0.0
 )

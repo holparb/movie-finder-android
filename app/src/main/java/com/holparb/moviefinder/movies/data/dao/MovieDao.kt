@@ -21,7 +21,7 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE is_popular ORDER BY release_date DESC LIMIT 20")
     fun getPopularMoviesForHomeScreen(): Flow<List<MovieEntity>>
 
-    @Query("SELECT * FROM movies WHERE is_popular")
+    @Query("SELECT * FROM movies WHERE is_popular ORDER BY popularity DESC")
     fun getPopularMoviesWithPagination():PagingSource<Int, MovieEntity>
 
     @Query("SELECT * FROM movies WHERE is_top_rated ORDER BY rating DESC")
