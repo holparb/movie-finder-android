@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
 import com.holparb.moviefinder.movies.domain.model.MovieListType
+import com.holparb.moviefinder.movies.presentation.details.MovieDetailsScreen
 import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreen
 import com.holparb.moviefinder.movies.presentation.see_more.SeeMoreScreen
 import kotlinx.serialization.Serializable
@@ -15,22 +16,43 @@ import kotlinx.serialization.Serializable
 fun Navigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = SubGraph.MainScreens) {
         navigation<SubGraph.MainScreens>(
-            startDestination = Destination.HomeScreenComposable
+            startDestination = Destination.HomeScreenDestination
         ) {
-            composable<Destination.HomeScreenComposable> {
-                HomeScreen(navController = navController)
+            composable<Destination.HomeScreenDestination> {
+                HomeScreen(
+                    onNavigateToSeeMoreScreen = { title, movieListType ->
+                        navController.navigate(
+                            Destination.SeeMoreScreenDestination(
+                                title = title,
+                                listType = movieListType
+                            )
+                        )
+                    },
+                    onNavigateToMovieDetails = { movieId ->
+                        navController.navigate(
+                            Destination.MovieDetailsDestination(movieId = movieId)
+                        )
+                    }
+                )
             }
         }
         navigation<SubGraph.SeeMoreScreens>(
-            startDestination = Destination.SeeMoreScreenComposable()
+            startDestination = Destination.SeeMoreScreenDestination()
         ) {
-            composable<Destination.SeeMoreScreenComposable> { backStackEntry ->
-                val args = backStackEntry.toRoute<Destination.SeeMoreScreenComposable>()
+            composable<Destination.SeeMoreScreenDestination> { backStackEntry ->
+                val args = backStackEntry.toRoute<Destination.SeeMoreScreenDestination>()
                 SeeMoreScreen(
                     title = args.title,
                     listType = args.listType,
                     onBack = { navController.popBackStack() }
                 )
+            }
+        }
+        navigation<SubGraph.DetailsScreen>(
+            startDestination = Destination.MovieDetailsDestination()
+        ) {
+            composable<Destination.MovieDetailsDestination> {
+                MovieDetailsScreen()
             }
         }
     }
@@ -42,21 +64,27 @@ sealed class SubGraph {
 
     @Serializable
     data object SeeMoreScreens: SubGraph()
+
+    @Serializable
+    data object DetailsScreen: SubGraph()
 }
 
 sealed class Destination {
     @Serializable
-    data object HomeScreenComposable: Destination()
+    data object HomeScreenDestination: Destination()
 
     @Serializable
-    data object WatchlistComposable: Destination()
+    data object WatchlistDestination: Destination()
 
     @Serializable
-    data object SearchScreenComposable: Destination()
+    data object SearchScreenDestination: Destination()
 
     @Serializable
-    data class SeeMoreScreenComposable(
+    data class SeeMoreScreenDestination(
         val title: String = "",
         val listType: MovieListType = MovieListType.PopularMovies
     ): Destination()
+
+    @Serializable
+    data class MovieDetailsDestination(val movieId: Int = 0): Destination()
 }

@@ -104,7 +104,7 @@ fun MovieDetailsHeader(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "8.5" ,
+                    text = movieDetailsUi.rating,
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                 )
             }

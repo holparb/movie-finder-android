@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun MainMovieItem(
     state: MovieListState,
+    onNavigateToMovieDetails: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -42,7 +43,7 @@ fun MainMovieItem(
             .clickable(
                 enabled = state.isLoading.not() && state.movieList.isNotEmpty()
             ) {
-
+                onNavigateToMovieDetails(state.movieList.first().id)
             }
     ) {
         if(state.isLoading) {
@@ -106,6 +107,6 @@ fun MainMovieItem(
 @Composable
 private fun MainMovieItemPreview() {
     MovieFinderTheme {
-        MainMovieItem(state = MovieListState(movieListType = MovieListType.PopularMovies), modifier = Modifier.height(300.dp))
+        MainMovieItem(state = MovieListState(movieListType = MovieListType.PopularMovies), onNavigateToMovieDetails = {}, modifier = Modifier.height(300.dp))
     }
 }
