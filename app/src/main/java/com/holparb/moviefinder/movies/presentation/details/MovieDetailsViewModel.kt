@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.holparb.moviefinder.core.domain.util.DatabaseError
+import com.holparb.moviefinder.core.domain.util.NetworkError
 import com.holparb.moviefinder.core.domain.util.onError
 import com.holparb.moviefinder.core.domain.util.onSuccess
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
@@ -51,10 +53,16 @@ class MovieDetailsViewModel @Inject constructor(
                         movieDetailsUi = it.toMovieDetailsUi()
                     )
                 }
-                .onError {
+                .onError { error ->
                     savedStateHandle["state"] = savedStateHandle.get<MovieDetailsState>("state")?.copy(
                         isLoading = false
                     )
+                    when(error) {
+                        is NetworkError -> _events.send(MovieEvent.RemoteError(error))
+                        is DatabaseError -> _events.send(MovieEvent.LocalError(error))
+                        else -> {}
+                    }
+                    _events.send(MovieEvent.RemoteError(NetworkError.SERVER_ERROR))
                 }
         }
 

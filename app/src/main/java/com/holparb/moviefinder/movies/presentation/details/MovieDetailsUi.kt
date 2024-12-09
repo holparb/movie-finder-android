@@ -13,7 +13,7 @@ data class MovieDetailsUi(
     val backdropPath: String? = null,
     val genre: String = "",
     val runtime: String = "",
-    val rating: String = "",
+    val rating: String = "No rating available",
     val overview: String = ""
 ): Parcelable
 
@@ -21,7 +21,7 @@ fun Movie.toMovieDetailsUi(): MovieDetailsUi {
     return MovieDetailsUi(
         id = id,
         title = title,
-        rating = rating?.toString() ?: "",
+        rating = rating?.toString() ?: "No rating available",
         overview = overview,
         backdropPath = backdropPath,
         genre = if(genres.isNotEmpty()) genres.first().name else "",
