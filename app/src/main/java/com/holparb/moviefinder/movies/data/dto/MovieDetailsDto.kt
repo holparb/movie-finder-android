@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MovieListItemDto(
+data class MovieDetailsDto(
     val id: Int,
     val title: String,
     val overview: String,
@@ -14,9 +14,8 @@ data class MovieListItemDto(
     val backdropPath: String? = null,
     @SerialName("release_date")
     val releaseDate: String? = null,
-    @SerialName("genre_ids")
-    val genreIds: List<Int> = emptyList<Int>(),
     @SerialName("vote_average")
     val rating: Double? = null,
-    val popularity: Double = 0.0
+    val runtime: Int? = null,
+    val genres: List<GenreDto> = emptyList<GenreDto>()
 )

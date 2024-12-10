@@ -33,9 +33,9 @@ fun MainScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     navBackStackEntry?.destination?.let { currentDestination ->
-        bottomNavVisible = (currentDestination.hasRoute(Destination.HomeScreenComposable::class)
-                || currentDestination.hasRoute(Destination.WatchlistComposable::class)
-                || currentDestination.hasRoute(Destination.SearchScreenComposable::class))
+        bottomNavVisible = (currentDestination.hasRoute(Destination.HomeScreenDestination::class)
+                || currentDestination.hasRoute(Destination.WatchlistDestination::class)
+                || currentDestination.hasRoute(Destination.SearchScreenDestination::class))
     }
 
     Scaffold(

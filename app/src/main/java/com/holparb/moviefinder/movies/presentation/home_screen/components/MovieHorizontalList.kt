@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.movies.presentation.home_screen.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,18 +20,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.holparb.moviefinder.core.presentation.util.TestTags
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
-import com.holparb.moviefinder.movies.presentation.navigation.Destination
 
 @Composable
 fun MovieHorizontalList(
     state: MovieListState,
     title: String,
-    navController: NavHostController,
+    onNavigateToMovieDetails: (Int) -> Unit,
+    onNavigateToSeeMoreScreen: (String, MovieListType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -41,12 +40,7 @@ fun MovieHorizontalList(
         SectionHeader(
             title = title,
             onClick = {
-                navController.navigate(
-                    Destination.SeeMoreScreenComposable(
-                        title = title,
-                        listType = state.movieListType
-                    )
-                )
+                onNavigateToSeeMoreScreen(title, state.movieListType)
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -64,12 +58,15 @@ fun MovieHorizontalList(
                 modifier = Modifier.testTag(TestTags.MOVIE_HORIZONTAL_LIST_ITEMS),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                items(state.movieList) { item ->
+                items(state.movieList) { movie ->
                     MoviePosterPicture(
-                        movie = item,
+                        movie = movie,
                         modifier = Modifier
                             .width(120.dp)
                             .height(180.dp)
+                            .clickable {
+                                onNavigateToMovieDetails(movie.id)
+                            }
                     )
                 }
             }
@@ -90,5 +87,5 @@ class ListStateParameterProvider: PreviewParameterProvider<MovieListState> {
 private fun MovieHorizontalListPreview(
     @PreviewParameter(provider = ListStateParameterProvider::class) state: MovieListState
 ) {
-    MovieHorizontalList(state = state, modifier = Modifier.height(250.dp), title = "Title", navController = rememberNavController())
+    MovieHorizontalList(state = state, modifier = Modifier.height(250.dp), title = "Title", onNavigateToMovieDetails = {}, onNavigateToSeeMoreScreen = { _, _ -> })
 }

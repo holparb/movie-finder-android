@@ -10,6 +10,7 @@ import com.holparb.moviefinder.core.domain.util.onError
 import com.holparb.moviefinder.core.domain.util.onSuccess
 import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
+import com.holparb.moviefinder.movies.domain.util.MovieEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +37,7 @@ class HomeScreenViewModel @Inject constructor(
             HomeScreenState()
         )
 
-    private val _events = Channel<MovieListEvent>()
+    private val _events = Channel<MovieEvent>()
     val events = _events.receiveAsFlow()
 
     private var _error: Error? = null
@@ -72,7 +73,6 @@ class HomeScreenViewModel @Inject constructor(
             }
     }
 
-
     fun loadHomeScreenContent() {
         viewModelScope.launch {
             loadPopularMoviesAndMainItem()
@@ -81,8 +81,8 @@ class HomeScreenViewModel @Inject constructor(
 
             if(_error != null) {
                 when(_error) {
-                    is NetworkError -> _events.send(MovieListEvent.RemoteError(_error as NetworkError))
-                    is DatabaseError -> _events.send(MovieListEvent.LocalError(_error as DatabaseError))
+                    is NetworkError -> _events.send(MovieEvent.RemoteError(_error as NetworkError))
+                    is DatabaseError -> _events.send(MovieEvent.LocalError(_error as DatabaseError))
                     else -> {}
                 }
             }

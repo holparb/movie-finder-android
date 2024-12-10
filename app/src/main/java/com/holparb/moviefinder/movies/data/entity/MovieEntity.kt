@@ -17,6 +17,7 @@ data class MovieEntity (
     @ColumnInfo(name = "release_date") val releaseDate: String?,
     val runtime: Int? = null,
     val rating: Double? = null,
+    val popularity: Double = 0.0,
     @ColumnInfo(name = "genre_ids") val genreIds: List<Int>,
     val details: Boolean = false,
     @ColumnInfo(name = "is_popular")

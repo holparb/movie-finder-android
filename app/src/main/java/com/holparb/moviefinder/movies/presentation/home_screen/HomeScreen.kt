@@ -14,15 +14,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.holparb.moviefinder.core.presentation.util.ObserveAsEvents
 import com.holparb.moviefinder.core.presentation.util.toString
+import com.holparb.moviefinder.movies.domain.model.MovieListType
+import com.holparb.moviefinder.movies.domain.util.MovieEvent
 import com.holparb.moviefinder.movies.presentation.home_screen.components.MainMovieItem
 import com.holparb.moviefinder.movies.presentation.home_screen.components.MovieHorizontalList
 
 @Composable
 fun HomeScreen(
-    navController: NavHostController
+    onNavigateToSeeMoreScreen: (String, MovieListType) -> Unit,
+    onNavigateToMovieDetails: (movieId: Int) -> Unit
 ) {
     val homeScreenViewModel = hiltViewModel<HomeScreenViewModel>()
     val scrollState = rememberScrollState()
@@ -31,8 +33,8 @@ fun HomeScreen(
 
     ObserveAsEvents(events = homeScreenViewModel.events) { event ->
         val toastText = when(event) {
-            is MovieListEvent.RemoteError -> event.error.toString(context)
-            is MovieListEvent.LocalError -> event.error.toString(context)
+            is MovieEvent.RemoteError -> event.error.toString(context)
+            is MovieEvent.LocalError -> event.error.toString(context)
         }
         Toast.makeText(
             context,
@@ -48,25 +50,29 @@ fun HomeScreen(
     ) {
         MainMovieItem(
             state = state.movieLists[HomeScreenState.MAIN_ITEM]!!,
+            onNavigateToMovieDetails = onNavigateToMovieDetails,
             modifier = Modifier.height(280.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
         MovieHorizontalList(
             state = state.movieLists[HomeScreenState.POPULAR_MOVIES]!!,
             title = "Popular movies",
-            navController = navController
+            onNavigateToMovieDetails = onNavigateToMovieDetails,
+            onNavigateToSeeMoreScreen = onNavigateToSeeMoreScreen
         )
         Spacer(modifier = Modifier.height(16.dp))
         MovieHorizontalList(
             state = state.movieLists[HomeScreenState.TOP_RATED_MOVIES]!!,
             title = "Top rated movies",
-            navController = navController
+            onNavigateToMovieDetails = onNavigateToMovieDetails,
+            onNavigateToSeeMoreScreen = onNavigateToSeeMoreScreen
         )
         Spacer(modifier = Modifier.height(16.dp))
         MovieHorizontalList(
             state = state.movieLists[HomeScreenState.UPCOMING_MOVIES]!!,
             title = "Upcoming movies",
-            navController = navController
+            onNavigateToMovieDetails = onNavigateToMovieDetails,
+            onNavigateToSeeMoreScreen = onNavigateToSeeMoreScreen
         )
     }
 }

@@ -90,6 +90,12 @@ class MovieRepositoryImpl @Inject constructor (
         return getMoviesWithPagination(upcomingMoviesPager)
     }
 
+    override suspend fun getMovieDetails(movieId: Int): Result<Movie, Error> {
+        return moviesDataSource.getMovieDetails(movieId).map {
+            it.toMovie()
+        }
+    }
+
     override suspend fun getTopRatedMovies(
         page: Int,
         region: String
