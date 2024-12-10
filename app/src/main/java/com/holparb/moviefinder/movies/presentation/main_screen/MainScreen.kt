@@ -13,8 +13,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -24,8 +22,6 @@ import com.holparb.moviefinder.movies.presentation.main_screen.components.Bottom
 
 @Composable
 fun MainScreen() {
-    val viewModel = hiltViewModel<MainViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
     val navController = rememberNavController()
     var bottomNavVisible by rememberSaveable {
         mutableStateOf(true)
@@ -45,9 +41,7 @@ fun MainScreen() {
         bottomBar = {
             if(bottomNavVisible) {
                 BottomNavigationBar(
-                    navController = navController,
-                    //selectedIndex = state.selectedIndex,
-                    //changeNavigationSelectedIndex = viewModel::changeNavigationSelectedIndex
+                    navController = navController
                 )
             }
         }

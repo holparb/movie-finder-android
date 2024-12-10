@@ -37,8 +37,6 @@ data class BottomNavigationItem(
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController,
-    //selectedIndex: Int,
-    //changeNavigationSelectedIndex: (Int) -> Unit,
 ) {
     val bottomNavItems = listOf(
         BottomNavigationItem(
