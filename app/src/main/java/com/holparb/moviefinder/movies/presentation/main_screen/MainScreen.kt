@@ -18,9 +18,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.holparb.moviefinder.core.navigation.Destination
+import com.holparb.moviefinder.core.navigation.Navigation
 import com.holparb.moviefinder.movies.presentation.main_screen.components.BottomNavigationBar
-import com.holparb.moviefinder.movies.presentation.navigation.Destination
-import com.holparb.moviefinder.movies.presentation.navigation.Navigation
 
 @Composable
 fun MainScreen() {
@@ -46,8 +46,8 @@ fun MainScreen() {
             if(bottomNavVisible) {
                 BottomNavigationBar(
                     navController = navController,
-                    selectedIndex = state.selectedIndex,
-                    changeNavigationSelectedIndex = viewModel::changeNavigationSelectedIndex
+                    //selectedIndex = state.selectedIndex,
+                    //changeNavigationSelectedIndex = viewModel::changeNavigationSelectedIndex
                 )
             }
         }
