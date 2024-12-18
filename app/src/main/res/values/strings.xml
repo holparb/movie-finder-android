@@ -8,4 +8,7 @@
     <string name="db_fetch_error">Could not get data from database.</string>
     <string name="db_upsert_error">Could not write data.</string>
     <string name="db_delete_error">Could not delete data.</string>
+    <string name="token_request_error">Couldn\'t create request token to start login, please try again</string>
+    <string name="invalid_login_parameters">Invalid username or password</string>
+    <string name="session_creation_error">Couldn\'t create session, please try again\n</string>
 </resources>

@@ -2,6 +2,7 @@ package com.holparb.moviefinder.core.presentation.util
 
 import android.content.Context
 import com.holparb.moviefinder.R
+import com.holparb.moviefinder.core.domain.util.AuthError
 import com.holparb.moviefinder.core.domain.util.DatabaseError
 import com.holparb.moviefinder.core.domain.util.NetworkError
 
@@ -23,6 +24,15 @@ fun DatabaseError.toString(context: Context): String {
         DatabaseError.FETCH_ERROR -> R.string.db_fetch_error
         DatabaseError.DELETE_ERROR -> R.string.db_delete_error
         DatabaseError.UPSERT_ERROR -> R.string.db_upsert_error
+    }
+    return context.getString(resId)
+}
+
+fun AuthError.toString(context: Context): String {
+    val resId = when(this) {
+        AuthError.TOKEN_REQUEST_ERROR -> R.string.token_request_error
+        AuthError.INVALID_LOGIN_PARAMETERS -> R.string.invalid_login_parameters
+        AuthError.SESSION_CREATION_ERROR -> R.string.session_creation_error
     }
     return context.getString(resId)
 }

@@ -2,6 +2,9 @@ package com.holparb.moviefinder.di
 
 import android.content.Context
 import androidx.room.Room
+import com.holparb.moviefinder.auth.data.datasource.AuthDataSource
+import com.holparb.moviefinder.auth.data.repository.AuthRepositoryImpl
+import com.holparb.moviefinder.auth.domain.repository.AuthRepository
 import com.holparb.moviefinder.core.data.networking.HttpClientFactory
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.dao.RemoteKeyDao
@@ -32,7 +35,13 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRemoteMovieDatasource(httpClient: HttpClient): RemoteMoviesDataSource {
-        return RemoteMoviesDataSource(httpClient);
+        return RemoteMoviesDataSource(httpClient)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthDataSource(httpClient: HttpClient): AuthDataSource {
+        return AuthDataSource(httpClient)
     }
 
     @Provides
@@ -60,11 +69,17 @@ object AppModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class MovieRepositoryModule {
+abstract class RepositoryModule {
 
     @Binds
     @Singleton
     abstract fun bindMovieRepository(
         movieRepositoryImpl: MovieRepositoryImpl
     ): MovieRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        authRepositoryImpl: AuthRepositoryImpl
+    ): AuthRepository
 }
