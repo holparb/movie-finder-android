@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.junit.ktx)
 
     implementation(libs.bundles.compose)
+    implementation(libs.androidx.security.crypto.ktx)
     debugImplementation(libs.bundles.compose.debug)
 
     // Navigation with class serialization

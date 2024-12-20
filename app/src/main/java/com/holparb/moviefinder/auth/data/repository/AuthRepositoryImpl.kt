@@ -4,13 +4,15 @@ import com.holparb.moviefinder.auth.data.datasource.AuthDataSource
 import com.holparb.moviefinder.auth.domain.repository.AuthRepository
 import com.holparb.moviefinder.core.domain.util.AuthError
 import com.holparb.moviefinder.core.domain.util.Error
+import com.holparb.moviefinder.core.domain.util.LocalEncryptedStorage
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.onError
 import com.holparb.moviefinder.core.domain.util.onSuccess
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val authDataSource: AuthDataSource
+    private val authDataSource: AuthDataSource,
+    private val localEncryptedStorage: LocalEncryptedStorage
 ) : AuthRepository {
     override suspend fun login(
         username: String,
@@ -50,6 +52,7 @@ class AuthRepositoryImpl @Inject constructor(
         if(sessionId == null) {
             return Result.Error(AuthError.SESSION_CREATION_ERROR)
         }
+        localEncryptedStorage.saveSessionId(sessionId!!)
         return Result.Success(sessionId!!)
     }
 }

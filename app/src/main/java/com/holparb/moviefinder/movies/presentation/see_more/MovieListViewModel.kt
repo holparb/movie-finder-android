@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MovieListViewModel @Inject constructor(
-    private val repository: MovieRepository,
+    private val repository: MovieRepository
 ): ViewModel() {
 
     private var _pagingDataFlow: Flow<PagingData<Movie>> = flowOf(PagingData.empty())

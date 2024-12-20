@@ -3,12 +3,14 @@ package com.holparb.moviefinder.auth.data.datasource
 import com.holparb.moviefinder.auth.data.dto.RequestTokenDto
 import com.holparb.moviefinder.auth.data.dto.SessionDto
 import com.holparb.moviefinder.auth.data.dto.TokenValidation
+import com.holparb.moviefinder.auth.data.dto.UserAccountDto
 import com.holparb.moviefinder.core.data.networking.constructUrl
 import com.holparb.moviefinder.core.data.networking.safeCall
 import com.holparb.moviefinder.core.domain.util.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -54,6 +56,18 @@ class AuthDataSource @Inject constructor(
             ) {
                 contentType(ContentType.Application.Json)
                 setBody(requestToken)
+            }
+        }
+    }
+
+    suspend fun getUserAccountDetails(
+        sessionId: String
+    ): Result<UserAccountDto,NetworkError> {
+        return safeCall<UserAccountDto> {
+            httpClient.get(
+                urlString = "/account"
+            ) {
+                parameter("session_id", sessionId)
             }
         }
     }

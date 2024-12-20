@@ -5,7 +5,9 @@ import androidx.room.Room
 import com.holparb.moviefinder.auth.data.datasource.AuthDataSource
 import com.holparb.moviefinder.auth.data.repository.AuthRepositoryImpl
 import com.holparb.moviefinder.auth.domain.repository.AuthRepository
+import com.holparb.moviefinder.core.data.local_storage.DefaultLocalEncryptedStorage
 import com.holparb.moviefinder.core.data.networking.HttpClientFactory
+import com.holparb.moviefinder.core.domain.util.LocalEncryptedStorage
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.dao.RemoteKeyDao
 import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
@@ -82,4 +84,10 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         authRepositoryImpl: AuthRepositoryImpl
     ): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLocalEncryptedStorage(
+        localEncryptedStorage: DefaultLocalEncryptedStorage
+    ): LocalEncryptedStorage
 }
