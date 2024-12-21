@@ -8,4 +8,6 @@ interface AuthRepository {
         username: String,
         password: String
     ): Result<String, Error>
+
+    fun isUserLoggedIn(): Boolean
 }
