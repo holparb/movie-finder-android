@@ -1,9 +1,10 @@
 package com.holparb.moviefinder.auth.presentation.login_screen.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -12,7 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.holparb.moviefinder.R
 import com.holparb.moviefinder.auth.presentation.login_screen.LoginFormEvent
 import com.holparb.moviefinder.auth.presentation.login_screen.LoginScreenState
 
@@ -23,10 +26,15 @@ fun LoginForm(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(16.dp),
+        modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.tmdb_logo),
+            contentDescription = "The Movie Database logo"
+        )
+        Spacer(Modifier.height(32.dp))
         OutlinedTextField(
             value = state.username,
             label = {
