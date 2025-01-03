@@ -2,7 +2,7 @@ package com.holparb.moviefinder.auth.data.repository
 
 import com.holparb.moviefinder.auth.data.datasource.AuthDataSource
 import com.holparb.moviefinder.auth.domain.repository.AuthRepository
-import com.holparb.moviefinder.core.domain.util.AuthError
+import com.holparb.moviefinder.core.domain.util.errors.AuthError
 import com.holparb.moviefinder.core.domain.util.Error
 import com.holparb.moviefinder.core.domain.util.LocalEncryptedStorage
 import com.holparb.moviefinder.core.domain.util.Result

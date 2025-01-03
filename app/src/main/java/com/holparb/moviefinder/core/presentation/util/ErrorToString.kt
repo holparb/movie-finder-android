@@ -2,9 +2,9 @@ package com.holparb.moviefinder.core.presentation.util
 
 import android.content.Context
 import com.holparb.moviefinder.R
-import com.holparb.moviefinder.core.domain.util.AuthError
-import com.holparb.moviefinder.core.domain.util.DatabaseError
-import com.holparb.moviefinder.core.domain.util.NetworkError
+import com.holparb.moviefinder.core.domain.util.errors.AuthError
+import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
+import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 
 fun NetworkError.toString(context: Context): String {
     val resId = when(this) {

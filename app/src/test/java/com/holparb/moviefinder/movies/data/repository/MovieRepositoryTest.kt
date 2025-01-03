@@ -2,8 +2,8 @@ package com.holparb.moviefinder.movies.data.repository
 
 import android.util.Log
 import androidx.paging.Pager
-import com.holparb.moviefinder.core.domain.util.DatabaseError
-import com.holparb.moviefinder.core.domain.util.NetworkError
+import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
+import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
@@ -69,7 +69,8 @@ class MovieRepositoryTest {
 
     @Test
     fun getPopularMovies_returns_fails_because_of_http_exception(): Unit = runBlocking {
-        coEvery { dataSource.getMoviesList(movieListType = MovieListType.PopularMovies) } returns Result.Error(NetworkError.SERVER_ERROR)
+        coEvery { dataSource.getMoviesList(movieListType = MovieListType.PopularMovies) } returns Result.Error(
+            NetworkError.SERVER_ERROR)
         coEvery { movieDao.upsertMovie(any<MovieEntity>()) } returns Unit
 
         val result = repository.getPopularMovies()

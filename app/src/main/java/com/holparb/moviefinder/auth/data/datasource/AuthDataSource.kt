@@ -6,7 +6,7 @@ import com.holparb.moviefinder.auth.data.dto.TokenValidation
 import com.holparb.moviefinder.auth.data.dto.UserAccountDto
 import com.holparb.moviefinder.core.data.networking.constructUrl
 import com.holparb.moviefinder.core.data.networking.safeCall
-import com.holparb.moviefinder.core.domain.util.NetworkError
+import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -62,7 +62,7 @@ class AuthDataSource @Inject constructor(
 
     suspend fun getUserAccountDetails(
         sessionId: String
-    ): Result<UserAccountDto,NetworkError> {
+    ): Result<UserAccountDto, NetworkError> {
         return safeCall<UserAccountDto> {
             httpClient.get(
                 urlString = "/account"

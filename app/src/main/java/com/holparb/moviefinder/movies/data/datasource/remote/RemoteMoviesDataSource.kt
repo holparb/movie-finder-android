@@ -2,7 +2,7 @@ package com.holparb.moviefinder.movies.data.datasource.remote
 
 import com.holparb.moviefinder.core.data.networking.constructUrl
 import com.holparb.moviefinder.core.data.networking.safeCall
-import com.holparb.moviefinder.core.domain.util.NetworkError
+import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.map
 import com.holparb.moviefinder.movies.data.dto.MovieDetailsDto
