@@ -11,4 +11,7 @@
     <string name="token_request_error">Couldn\'t create request token to start login, please try again</string>
     <string name="invalid_login_parameters">Invalid username or password</string>
     <string name="session_creation_error">Couldn\'t create session, please try again\n</string>
+    <string name="username_empty_error">Username can\'t be empty</string>
+    <string name="password_empty_error">Password can\'t be empty</string>
+    <string name="password_length_error">Password must be at least 4 characters long</string>
 </resources>
