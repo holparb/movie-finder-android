@@ -5,7 +5,6 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.navigation.compose.rememberNavController
 import com.holparb.moviefinder.core.presentation.util.TestTags
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
@@ -22,12 +21,12 @@ class MovieHorizontalListTest {
 
     private fun setContent(state: MovieListState = MovieListState(movieListType = MovieListType.PopularMovies), title: String = "Title") {
         composeRule.setContent {
-            val navController = rememberNavController()
             MovieFinderTheme {
                 MovieHorizontalList(
                     state = state,
                     title = title,
-                    navController = navController
+                    onNavigateToMovieDetails = {},
+                    onNavigateToSeeMoreScreen = {} as (String, MovieListType) -> Unit
                 )
             }
         }
