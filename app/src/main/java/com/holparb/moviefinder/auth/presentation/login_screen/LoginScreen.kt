@@ -11,11 +11,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.holparb.moviefinder.auth.presentation.login_screen.components.LoginForm
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(
+    navigateToWatchlist: () -> Unit
+) {
     val loginViewModel = hiltViewModel<LoginViewModel>()
     val state by loginViewModel.state.collectAsStateWithLifecycle()
     Scaffold(
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) { contentPadding ->
         LoginForm(
             state = state,
