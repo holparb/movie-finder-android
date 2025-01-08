@@ -60,7 +60,7 @@ fun MovieHorizontalList(
             ) {
                 items(state.movieList) { movie ->
                     MoviePosterPicture(
-                        movie = movie,
+                        posterPath = movie.posterPath,
                         modifier = Modifier
                             .width(120.dp)
                             .height(180.dp)

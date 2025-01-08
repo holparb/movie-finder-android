@@ -61,7 +61,7 @@ fun MovieVerticalList(
                     movies[index]?.let { movie ->
                         MovieVerticalListItem(
                             modifier = Modifier.height(200.dp),
-                            movie = movie
+                            movieVerticalListItemUi = movie.toMovieVerticalListItemUi()
                         )
                     }
                 }
