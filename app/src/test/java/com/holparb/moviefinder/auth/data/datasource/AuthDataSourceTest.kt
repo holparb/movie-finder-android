@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.auth.data.datasource
 
+import com.holparb.moviefinder.auth.data.dto.RequestTokenDto
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.testutils.JsonReader
@@ -49,7 +50,7 @@ class AuthDataSourceTest {
             val statusCode =
                 if (isSuccess == true) HttpStatusCode.OK else HttpStatusCode.InternalServerError
             val content =
-                if (isSuccess == true) JsonReader.readJsonFile("RequestTokenResponse.json")
+                if (isSuccess == true) JsonReader.readJsonFile("TokenAndSessionResponse.json")
                 else JsonReader.readJsonFile("AuthFailedResponse.json")
             respond(
                 content = content,
@@ -84,6 +85,40 @@ class AuthDataSourceTest {
     fun token_generation_failed() = runBlocking {
         givenFailure()
         val response = authDataSource.getRequestToken()
+        Assert.assertTrue(response is Result.Error)
+        Assert.assertEquals(NetworkError.SERVER_ERROR, (response as Result.Error).error)
+    }
+
+    @Test
+    fun token_validated_successfully() = runBlocking {
+        givenSuccess()
+        val response = authDataSource.validateToken("", "", "")
+        Assert.assertTrue(response is Result.Success)
+        Assert.assertTrue((response as Result.Success).data.success)
+        Assert.assertTrue(response.data.requestToken.isNotBlank())
+    }
+
+    @Test
+    fun token_validation_failed() = runBlocking {
+        givenFailure()
+        val response = authDataSource.validateToken("", "", "")
+        Assert.assertTrue(response is Result.Error)
+        Assert.assertEquals(NetworkError.SERVER_ERROR, (response as Result.Error).error)
+    }
+
+    @Test
+    fun session_generated_successfully() = runBlocking {
+        givenSuccess()
+        val response = authDataSource.createSession(RequestTokenDto(true, "", ""))
+        Assert.assertTrue(response is Result.Success)
+        Assert.assertTrue((response as Result.Success).data.success)
+        Assert.assertTrue(response.data.sessionId.isNotBlank())
+    }
+
+    @Test
+    fun session_generation_failed() = runBlocking {
+        givenFailure()
+        val response = authDataSource.createSession(RequestTokenDto(true, "", ""))
         Assert.assertTrue(response is Result.Error)
         Assert.assertEquals(NetworkError.SERVER_ERROR, (response as Result.Error).error)
     }
