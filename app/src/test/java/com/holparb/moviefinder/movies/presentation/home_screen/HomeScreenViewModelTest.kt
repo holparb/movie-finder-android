@@ -1,11 +1,9 @@
-package com.holparb.moviefinder.movies.presentation.viewmodels
+package com.holparb.moviefinder.movies.presentation.home_screen
 
 import app.cash.turbine.test
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
-import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreenState
-import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreenViewModel
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
