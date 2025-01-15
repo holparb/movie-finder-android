@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.holparb.moviefinder.auth.domain.repository.AuthRepository
 import com.holparb.moviefinder.core.domain.util.login_form_validator.LoginFormValidator
+import com.holparb.moviefinder.core.domain.util.onError
+import com.holparb.moviefinder.core.domain.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,7 +74,13 @@ class LoginViewModel @Inject constructor(
     private fun submitData() {
         if(isFormValid().not()) return
         viewModelScope.launch {
-            
+            authRepository.login(username = state.value.username, password = state.value.password)
+                .onSuccess {
+                    _channel.send(LoginResult.Success)
+                }
+                .onError {
+                    _channel.send(LoginResult.Failure(it))
+                }
         }
     }
 
