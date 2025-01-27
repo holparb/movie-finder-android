@@ -73,12 +73,21 @@ class LoginViewModel @Inject constructor(
 
     private fun submitData() {
         if(isFormValid().not()) return
+        _state.update {
+            it.copy(loginInProgress = true)
+        }
         viewModelScope.launch {
             authRepository.login(username = state.value.username, password = state.value.password)
                 .onSuccess {
+                    _state.update { loginScreenState ->
+                        loginScreenState.copy(loginInProgress = false)
+                    }
                     _channel.send(LoginResult.Success)
                 }
                 .onError {
+                    _state.update { loginScreenState ->
+                        loginScreenState.copy(loginInProgress = false)
+                    }
                     _channel.send(LoginResult.Failure(it))
                 }
         }

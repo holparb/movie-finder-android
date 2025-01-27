@@ -27,8 +27,8 @@ fun LoginScreen(
         when(loginResult) {
             is LoginResult.Failure -> {
                 val toastText = when(loginResult.error) {
-                    is LoginError.Auth -> loginResult.error.error.toString(context)
-                    is LoginError.Network -> loginResult.error.error.toString(context)
+                    is LoginError.Auth -> loginResult.error.authError.toString(context)
+                    is LoginError.Network -> loginResult.error.networkError.toString(context)
                 }
                 Toast.makeText(
                     context,
