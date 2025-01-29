@@ -1,6 +1,5 @@
 package com.holparb.moviefinder.auth.presentation.login_screen.components
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,11 +42,7 @@ fun LoginForm(
                     is LoginError.Auth -> loginResult.error.authError.toString(context)
                     is LoginError.Network -> loginResult.error.networkError.toString(context)
                 }
-                Toast.makeText(
-                    context,
-                    toastText,
-                    Toast.LENGTH_LONG
-                ).show()
+                onEvent(LoginFormEvent.DisplayToast(toastText))
             }
             LoginResult.Success -> {
                 navigateToWatchlist()

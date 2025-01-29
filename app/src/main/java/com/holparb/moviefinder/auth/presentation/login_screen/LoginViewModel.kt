@@ -6,6 +6,7 @@ import com.holparb.moviefinder.auth.domain.repository.AuthRepository
 import com.holparb.moviefinder.core.domain.util.login_form_validator.LoginFormValidator
 import com.holparb.moviefinder.core.domain.util.onError
 import com.holparb.moviefinder.core.domain.util.onSuccess
+import com.holparb.moviefinder.core.domain.util.toast_display.ToastDisplay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginFormValidator: LoginFormValidator,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val toastDisplay: ToastDisplay
 ): ViewModel() {
 
     private val _state = MutableStateFlow(LoginScreenState())
@@ -98,6 +100,7 @@ class LoginViewModel @Inject constructor(
             LoginFormEvent.Submit -> submitData()
             is LoginFormEvent.PasswordChanged -> updatePassword(event.password)
             is LoginFormEvent.UsernameChanged -> updateUsername(event.username)
+            is LoginFormEvent.DisplayToast -> toastDisplay.showLongToast(event.message)
         }
     }
 }

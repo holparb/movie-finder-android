@@ -8,11 +8,13 @@ import com.holparb.moviefinder.core.domain.util.errors.LoginError
 import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.login_form_validator.LoginFormValidator
 import com.holparb.moviefinder.core.domain.util.login_form_validator.ValidationResult
+import com.holparb.moviefinder.core.domain.util.toast_display.ToastDisplay
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -25,22 +27,25 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(JUnit4::class)
 class LoginViewModelTest {
 
     private lateinit var authRepository: AuthRepository
     private lateinit var loginFormValidator: LoginFormValidator
     private lateinit var loginViewModel: LoginViewModel
+    private lateinit var toastDisplay: ToastDisplay
 
     @Before
     fun setup() {
         authRepository = mockk()
         loginFormValidator = mockk()
-        loginViewModel = LoginViewModel(authRepository = authRepository, loginFormValidator = loginFormValidator)
+        toastDisplay = mockk()
+        loginViewModel = LoginViewModel(
+            authRepository = authRepository,
+            loginFormValidator = loginFormValidator,
+            toastDisplay = toastDisplay
+        )
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
@@ -241,5 +246,15 @@ class LoginViewModelTest {
             Assert.assertEquals(LoginResult.Failure(loginError), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun toast_is_display_on_DisplayToastEvent() {
+        val message = "message to display"
+        every { toastDisplay.showLongToast(any()) } returns Unit
+
+        loginViewModel.onEvent(LoginFormEvent.DisplayToast(message))
+
+        verify(exactly = 1) { toastDisplay.showLongToast(message) }
     }
 }

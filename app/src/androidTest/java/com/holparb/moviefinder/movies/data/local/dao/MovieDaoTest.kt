@@ -80,7 +80,7 @@ class MovieDaoTest {
     }
 
     @Before
-    fun setup() {
+    fun setUp() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         movieDatabase = Room.inMemoryDatabaseBuilder(
             appContext,
