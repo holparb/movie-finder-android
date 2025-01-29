@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.auth.presentation.login_screen.components
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,18 +14,46 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.holparb.moviefinder.R
 import com.holparb.moviefinder.auth.presentation.login_screen.LoginFormEvent
+import com.holparb.moviefinder.auth.presentation.login_screen.LoginResult
 import com.holparb.moviefinder.auth.presentation.login_screen.LoginScreenState
+import com.holparb.moviefinder.core.domain.util.errors.LoginError
+import com.holparb.moviefinder.core.presentation.util.ObserveAsEvents
+import com.holparb.moviefinder.core.presentation.util.toString
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun LoginForm(
     state: LoginScreenState,
+    events: Flow<LoginResult>,
     onEvent: (LoginFormEvent) -> Unit,
+    navigateToWatchlist: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
+    ObserveAsEvents(events) { loginResult ->
+        when(loginResult) {
+            is LoginResult.Failure -> {
+                val toastText = when(loginResult.error) {
+                    is LoginError.Auth -> loginResult.error.authError.toString(context)
+                    is LoginError.Network -> loginResult.error.networkError.toString(context)
+                }
+                Toast.makeText(
+                    context,
+                    toastText,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            LoginResult.Success -> {
+                navigateToWatchlist()
+            }
+        }
+    }
     Column(
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
