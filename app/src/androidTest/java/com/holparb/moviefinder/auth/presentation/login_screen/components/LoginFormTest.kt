@@ -1,7 +1,13 @@
 package com.holparb.moviefinder.auth.presentation.login_screen.components
 
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
+import com.holparb.moviefinder.R
 import com.holparb.moviefinder.auth.presentation.login_screen.LoginFormEvent
 import com.holparb.moviefinder.auth.presentation.login_screen.LoginResult
 import com.holparb.moviefinder.auth.presentation.login_screen.LoginScreenState
@@ -80,5 +86,32 @@ class LoginFormTest {
         _events.send(LoginResult.Success)
 
         verify(exactly = 1) { navigate() }
+    }
+
+    @Test
+    fun form_display_in_default_state() {
+        setContent()
+
+        composeRule.onNode(hasContentDescription("The Movie Database logo")).assertIsDisplayed()
+        composeRule.onNodeWithText("Username").assertIsDisplayed()
+        composeRule.onNodeWithText("Password").assertIsDisplayed()
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        composeRule.onNodeWithText(context.resources.getString(R.string.username_empty_error)).assertIsNotDisplayed()
+        composeRule.onNodeWithText(context.resources.getString(R.string.password_empty_error)).assertIsNotDisplayed()
+        composeRule.onNodeWithText(context.resources.getString(R.string.password_length_error)).assertIsNotDisplayed()
+
+        composeRule.onNodeWithText("Login").assertIsDisplayed()
+    }
+
+    @Test
+    fun username_and_password_change_triggers_callback() {
+        setContent()
+        val text = "some text"
+        composeRule.onNodeWithText("Username").performTextInput(text)
+        composeRule.onNodeWithText("Password").performTextInput(text)
+
+        verify { onEvent(LoginFormEvent.UsernameChanged(text)) }
+        verify { onEvent(LoginFormEvent.PasswordChanged(text)) }
     }
 }
