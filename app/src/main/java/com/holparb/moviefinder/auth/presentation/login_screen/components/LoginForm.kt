@@ -106,9 +106,7 @@ fun LoginForm(
                     strokeWidth = 3.dp,
                     modifier = Modifier
                         .size(24.dp)
-                        .semantics {
-                        stateDescription = loadingDescription
-                    }
+                        .semantics { stateDescription = loadingDescription }
                 )
             } else {
                 Text(text = "Login")
