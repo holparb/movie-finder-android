@@ -14,4 +14,5 @@
     <string name="username_empty_error">Username can\'t be empty</string>
     <string name="password_empty_error">Password can\'t be empty</string>
     <string name="password_length_error">Password must be at least 4 characters long</string>
+    <string name="loading_description">Loading</string>
 </resources>

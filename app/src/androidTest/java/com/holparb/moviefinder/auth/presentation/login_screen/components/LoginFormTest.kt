@@ -3,8 +3,10 @@ package com.holparb.moviefinder.auth.presentation.login_screen.components
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
 import com.holparb.moviefinder.R
@@ -67,7 +69,7 @@ class LoginFormTest {
 
     @Test
     fun login_failed_event_is_sent() = runTest {
-        var _events = Channel<LoginResult>()
+        val _events = Channel<LoginResult>()
         val events = _events.receiveAsFlow()
 
         setContent(events = events)
@@ -79,7 +81,7 @@ class LoginFormTest {
 
     @Test
     fun login_successful_event_is_sent() = runTest {
-        var _events = Channel<LoginResult>()
+        val _events = Channel<LoginResult>()
         val events = _events.receiveAsFlow()
 
         setContent(events = events)
@@ -102,16 +104,29 @@ class LoginFormTest {
         composeRule.onNodeWithText(context.resources.getString(R.string.password_length_error)).assertIsNotDisplayed()
 
         composeRule.onNodeWithText("Login").assertIsDisplayed()
+        composeRule.onNode(hasStateDescription(context.resources.getString(R.string.loading_description))).assertIsNotDisplayed()
     }
 
     @Test
-    fun username_and_password_change_triggers_callback() {
+    fun username_password_login_button_change_triggers_callback() {
         setContent()
         val text = "some text"
         composeRule.onNodeWithText("Username").performTextInput(text)
         composeRule.onNodeWithText("Password").performTextInput(text)
+        composeRule.onNodeWithText("Login").performClick()
 
         verify { onEvent(LoginFormEvent.UsernameChanged(text)) }
         verify { onEvent(LoginFormEvent.PasswordChanged(text)) }
+        verify { onEvent(LoginFormEvent.Submit) }
+    }
+
+    @Test
+    fun username_and_password_error_display_supporting_text() {
+        val usernameError = "username error"
+        val passwordError = "password error"
+        setContent(state = LoginScreenState(usernameError = usernameError, passwordError = passwordError))
+
+        composeRule.onNodeWithText(usernameError).assertIsDisplayed()
+        composeRule.onNodeWithText(passwordError).assertIsDisplayed()
     }
 }

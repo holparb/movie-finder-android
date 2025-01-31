@@ -7,14 +7,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.holparb.moviefinder.R
 import com.holparb.moviefinder.auth.presentation.login_screen.LoginFormEvent
@@ -68,7 +75,7 @@ fun LoginForm(
             isError = state.usernameError != null,
             supportingText = {
                 if(state.usernameError != null) {
-                    Text(text = state.usernameError)
+                    Text(text = state.usernameError, color = MaterialTheme.colorScheme.error)
                 }
             }
         )
@@ -82,7 +89,7 @@ fun LoginForm(
             isError = state.passwordError != null,
             supportingText = {
                 if(state.passwordError != null) {
-                    Text(text = state.passwordError)
+                    Text(text = state.passwordError, color = MaterialTheme.colorScheme.error)
                 }
             }
         )
@@ -92,7 +99,20 @@ fun LoginForm(
                 onEvent(LoginFormEvent.Submit)
             },
         ) {
-            Text(text = "Login")
+            if(state.loginInProgress) {
+                val loadingDescription = stringResource(R.string.loading_description)
+                CircularProgressIndicator(
+                    color = Color.White,
+                    strokeWidth = 3.dp,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .semantics {
+                        stateDescription = loadingDescription
+                    }
+                )
+            } else {
+                Text(text = "Login")
+            }
         }
     }
 }
