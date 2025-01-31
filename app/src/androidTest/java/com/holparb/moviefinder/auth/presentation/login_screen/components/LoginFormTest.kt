@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.auth.presentation.login_screen.components
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasContentDescription
@@ -40,10 +41,13 @@ class LoginFormTest {
     private lateinit var onEvent: (LoginFormEvent) -> Unit
     private lateinit var navigate: () -> Unit
 
+    private lateinit var context: Context
+
     @Before
     fun setUp() {
         onEvent = mockk<(LoginFormEvent) -> Unit>(relaxed = true)
         navigate = mockk<() -> Unit>(relaxed = true)
+        context = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
     @After
@@ -98,7 +102,6 @@ class LoginFormTest {
         composeRule.onNodeWithText("Username").assertIsDisplayed()
         composeRule.onNodeWithText("Password").assertIsDisplayed()
 
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
         composeRule.onNodeWithText(context.resources.getString(R.string.username_empty_error)).assertIsNotDisplayed()
         composeRule.onNodeWithText(context.resources.getString(R.string.password_empty_error)).assertIsNotDisplayed()
         composeRule.onNodeWithText(context.resources.getString(R.string.password_length_error)).assertIsNotDisplayed()
@@ -128,5 +131,21 @@ class LoginFormTest {
 
         composeRule.onNodeWithText(usernameError).assertIsDisplayed()
         composeRule.onNodeWithText(passwordError).assertIsDisplayed()
+    }
+
+    @Test
+    fun login_in_progress() {
+        val username = "username"
+        val password = "password"
+        setContent(state = LoginScreenState(loginInProgress = true, username = username, password = password))
+
+        composeRule.onNodeWithText(username).assertIsDisplayed()
+        composeRule.onNodeWithText(password).assertIsDisplayed()
+        composeRule.onNodeWithText(context.resources.getString(R.string.username_empty_error)).assertIsNotDisplayed()
+        composeRule.onNodeWithText(context.resources.getString(R.string.password_empty_error)).assertIsNotDisplayed()
+        composeRule.onNodeWithText(context.resources.getString(R.string.password_length_error)).assertIsNotDisplayed()
+
+        composeRule.onNodeWithText("Login").assertIsNotDisplayed()
+        composeRule.onNode(hasStateDescription(context.resources.getString(R.string.loading_description))).assertIsDisplayed()
     }
 }
