@@ -3,7 +3,7 @@ package com.holparb.moviefinder.core.data.local_storage
 import android.content.Context
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
+import androidx.security.crypto.MasterKey
 import com.holparb.moviefinder.core.domain.util.LocalEncryptedStorage
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -18,15 +18,17 @@ class DefaultLocalEncryptedStorage @Inject constructor(
         private const val USER_ID = "user_id"
     }
 
-    private val masterKeyAlias by lazy {
-        MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+    private val masterKey by lazy {
+        MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
     }
 
     private val encryptedSharedPreferences by lazy {
         EncryptedSharedPreferences.create(
-            PREFERENCE_NAME,
-            masterKeyAlias,
             context,
+            PREFERENCE_NAME,
+            masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )

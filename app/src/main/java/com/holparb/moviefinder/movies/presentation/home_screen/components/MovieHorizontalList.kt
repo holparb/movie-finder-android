@@ -15,12 +15,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.holparb.moviefinder.core.presentation.util.TestTags
+import com.holparb.moviefinder.R
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
 
@@ -45,28 +48,41 @@ fun MovieHorizontalList(
         )
         Spacer(modifier = Modifier.height(12.dp))
         if(state.isLoading) {
+            val loadingDescription = stringResource(R.string.loading_description)
             CircularProgressIndicator(
                 modifier = Modifier
                     .width(64.dp)
                     .align(Alignment.CenterHorizontally)
-                    .testTag(TestTags.MOVIE_HORIZONTAL_LIST_LOADING),
+                    .semantics { stateDescription = loadingDescription },
                 color = MaterialTheme.colorScheme.onBackground,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
         } else {
+            val loadedDescription = stringResource(R.string.loaded_description)
+            val seeMovieDetailsDescription = stringResource(R.string.see_movie_details_description)
             LazyRow(
-                modifier = Modifier.testTag(TestTags.MOVIE_HORIZONTAL_LIST_ITEMS),
+                modifier = Modifier
+                    .semantics{
+                        stateDescription = loadedDescription
+                    },
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(state.movieList) { movie ->
                     MoviePosterPicture(
-                        movie = movie,
+                        posterPath = movie.posterPath,
                         modifier = Modifier
                             .width(120.dp)
                             .height(180.dp)
-                            .clickable {
-                                onNavigateToMovieDetails(movie.id)
+                            .semantics {
+                                onClick(
+                                    label = seeMovieDetailsDescription,
+                                    action = { return@onClick true }
+                                )
                             }
+                            .clickable(
+                                onClick = { onNavigateToMovieDetails(movie.id) }
+                            )
+
                     )
                 }
             }
@@ -78,7 +94,7 @@ class ListStateParameterProvider: PreviewParameterProvider<MovieListState> {
     override val values: Sequence<MovieListState>
         get() = sequenceOf(
             MovieListState(movieListType = MovieListType.PopularMovies),
-            MovieListState(movieListType = MovieListType.PopularMovies, isLoading = false),
+            MovieListState(movieListType = MovieListType.PopularMovies, isLoading = true),
         )
 }
 

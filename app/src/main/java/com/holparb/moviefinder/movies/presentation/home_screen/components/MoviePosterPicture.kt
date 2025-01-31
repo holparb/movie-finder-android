@@ -9,17 +9,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.ui.theme.Shapes
-import java.time.LocalDate
 
 @Composable
 fun MoviePosterPicture(
-    movie: Movie,
+    posterPath: String?,
     modifier: Modifier = Modifier
 ) {
     AsyncImage(
-        model = movie.posterPath,
+        model = posterPath,
         contentDescription = "movie poster",
         modifier = modifier
             .clip(Shapes.medium)
@@ -31,7 +29,7 @@ fun MoviePosterPicture(
 @Composable
 private fun MovieHorizontalListItemPreview() {
     MoviePosterPicture(
-        Movie(id = 1, title = "Title", releaseDate = LocalDate.now(), posterPath = "", overview = "", backdropPath = ""),
+        "",
         modifier = Modifier
             .width(150.dp)
             .height(225.dp))

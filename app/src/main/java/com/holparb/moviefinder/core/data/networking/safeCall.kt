@@ -1,6 +1,6 @@
 package com.holparb.moviefinder.core.data.networking
 
-import com.holparb.moviefinder.core.domain.util.NetworkError
+import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.network.UnresolvedAddressException

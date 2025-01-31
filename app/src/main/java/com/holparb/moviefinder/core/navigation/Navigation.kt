@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
+import com.holparb.moviefinder.auth.presentation.login_screen.LoginScreen
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.details.MovieDetailsScreen
 import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreen
@@ -38,30 +39,29 @@ fun Navigation(navController: NavHostController) {
                 )
             }
             composable<Destination.WatchlistDestination> {
-                WatchListScreen()
+                WatchListScreen(
+                    navigateToLogin = { navController.navigate(Destination.LoginScreenDestination) }
+                )
             }
             composable<Destination.SearchScreenDestination> {
                 SearchScreen()
             }
         }
-        navigation<SubGraph.SeeMoreScreens>(
-            startDestination = Destination.SeeMoreScreenDestination()
-        ) {
-            composable<Destination.SeeMoreScreenDestination> { backStackEntry ->
-                val args = backStackEntry.toRoute<Destination.SeeMoreScreenDestination>()
-                SeeMoreScreen(
-                    title = args.title,
-                    listType = args.listType,
-                    onBack = { navController.popBackStack() }
-                )
-            }
+        composable<Destination.SeeMoreScreenDestination> { backStackEntry ->
+            val args = backStackEntry.toRoute<Destination.SeeMoreScreenDestination>()
+            SeeMoreScreen(
+                title = args.title,
+                listType = args.listType,
+                onBack = { navController.popBackStack() }
+            )
         }
-        navigation<SubGraph.DetailsScreen>(
-            startDestination = Destination.MovieDetailsDestination()
-        ) {
-            composable<Destination.MovieDetailsDestination> {
-                MovieDetailsScreen()
-            }
+        composable<Destination.MovieDetailsDestination> {
+            MovieDetailsScreen()
+        }
+        composable<Destination.LoginScreenDestination> {
+            LoginScreen(
+                navigateToWatchlist = { navController.navigate(Destination.WatchlistDestination) }
+            )
         }
     }
 }
@@ -69,12 +69,6 @@ fun Navigation(navController: NavHostController) {
 sealed class SubGraph {
     @Serializable
     data object MainScreens: SubGraph()
-
-    @Serializable
-    data object SeeMoreScreens: SubGraph()
-
-    @Serializable
-    data object DetailsScreen: SubGraph()
 }
 
 sealed class Destination {
@@ -95,4 +89,7 @@ sealed class Destination {
 
     @Serializable
     data class MovieDetailsDestination(val movieId: Int = 0): Destination()
+
+    @Serializable
+    data object LoginScreenDestination: Destination()
 }

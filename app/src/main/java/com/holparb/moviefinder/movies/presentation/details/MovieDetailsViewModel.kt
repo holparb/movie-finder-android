@@ -4,8 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.holparb.moviefinder.core.domain.util.DatabaseError
-import com.holparb.moviefinder.core.domain.util.NetworkError
+import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
+import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.onError
 import com.holparb.moviefinder.core.domain.util.onSuccess
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
