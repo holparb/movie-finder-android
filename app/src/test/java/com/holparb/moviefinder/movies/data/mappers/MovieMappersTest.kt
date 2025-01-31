@@ -1,12 +1,9 @@
 package com.holparb.moviefinder.movies.data.mappers
 
-import android.util.Log
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
 import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.domain.model.Movie
-import io.mockk.every
-import io.mockk.mockkStatic
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -77,14 +74,14 @@ class MovieMappersTest {
     @Test
     fun dto_mapped_to_model_correctly() {
         val dto = MovieListItemDto(id = 1, title = "title", overview = "overview", backdropPath = "/path", posterPath = "/path", genreIds = listOf(1,2,3), rating = 1.0, releaseDate = "1992-02-23")
-        val expectedModel = Movie(id = 1, title = "title", overview = "overview", backdropPath = RemoteMoviesDataSource.IMAGE_URL_W780 + "/path", posterPath = RemoteMoviesDataSource.IMAGE_URL_W500 + "/path", releaseDate = LocalDate.parse("1992-02-23", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+        val expectedModel = Movie(id = 1, title = "title", overview = "overview", rating = 1.0, backdropPath = RemoteMoviesDataSource.IMAGE_URL_W780 + "/path", posterPath = RemoteMoviesDataSource.IMAGE_URL_W500 + "/path", releaseDate = LocalDate.parse("1992-02-23", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
 
         Assert.assertEquals(expectedModel, dto.toMovie())
     }
 
     @Test
     fun dto_mapped_to_model_with_null_backdrop_and_poster_path() {
-        val dto = MovieListItemDto(id = 1, title = "title", overview = "overview", genreIds = listOf(1,2,3), rating = 1.0, releaseDate = "1992-02-23")
+        val dto = MovieListItemDto(id = 1, title = "title", overview = "overview", genreIds = listOf(1,2,3), releaseDate = "1992-02-23")
         val expectedModel = Movie(id = 1, title = "title", overview = "overview", backdropPath = null, posterPath = null, releaseDate = LocalDate.parse("1992-02-23", DateTimeFormatter.ofPattern("yyyy-MM-dd")))
 
         Assert.assertEquals(expectedModel, dto.toMovie())
@@ -93,18 +90,16 @@ class MovieMappersTest {
     @Test
     fun dto_mapped_to_model_with_null_release_date() {
         val dto = MovieListItemDto(id = 1, title = "title", overview = "overview", genreIds = listOf(1,2,3), rating = 1.0, releaseDate = null)
-        val expectedModel = Movie(id = 1, title = "title", overview = "overview", backdropPath = null, posterPath = null, releaseDate = null)
+        val expectedModel = Movie(id = 1, title = "title", overview = "overview", backdropPath = null, posterPath = null, releaseDate = null, rating = 1.0)
 
         Assert.assertEquals(expectedModel, dto.toMovie())
     }
 
     @Test
 
-    fun dto_with_invalid_release_date_is_mapped_minimally() {
-        val dto = MovieListItemDto(id = 1, title = "title", overview = "overview", backdropPath = "/path", posterPath = "/path", genreIds = listOf(1,2,3), rating = 1.0, releaseDate = "invalid")
-        val expectedModel = Movie(id = 1, title = "title", overview = "overview", backdropPath = null, posterPath = null, releaseDate = null)
-        mockkStatic(Log::class)
-        every { Log.e(any(), any<String>()) } returns 0
+    fun dto_with_invalid_release_date_is_mapped_correctly() {
+        val dto = MovieListItemDto(id = 1, title = "title", overview = "overview", genreIds = listOf(1,2,3), rating = 1.0, releaseDate = "invalid")
+        val expectedModel = Movie(id = 1, title = "title", overview = "overview", rating = 1.0, releaseDate = null)
         Assert.assertEquals(expectedModel, dto.toMovie())
     }
 }
