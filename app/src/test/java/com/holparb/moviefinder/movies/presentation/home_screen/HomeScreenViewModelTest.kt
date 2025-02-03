@@ -3,11 +3,11 @@ package com.holparb.moviefinder.movies.presentation.home_screen
 import app.cash.turbine.test
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.movies.domain.model.Movie
+import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -18,14 +18,13 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(JUnit4::class)
 class HomeScreenViewModelTest {
+
     private lateinit var repository: MovieRepository
     private lateinit var viewModel: HomeScreenViewModel
     private val movies: List<Movie> = listOf(
@@ -35,7 +34,6 @@ class HomeScreenViewModelTest {
         Movie(id = 4, title = "title", overview = "overview"),
         Movie(id = 5, title = "title", overview = "overview")
     )
-    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 
     @Before
     fun setup() {
@@ -51,23 +49,18 @@ class HomeScreenViewModelTest {
     }
 
     @Test
-    fun view_model_screen_states_should_be_loading_by_default() {
-        viewModel.state.value.movieLists.forEach { (_, value) ->
-            //Assert.assertTrue(value.movieList is DataLoadState.Loading)
-        }
-    }
-
-    @Test
-    fun each_movie_list_is_assigned_correct_load_event() {
+    fun movie_list_states_default_values_should_be_correct() {
         viewModel.state.value.movieLists.forEach { (key, value) ->
+            Assert.assertFalse(value.isLoading)
+            Assert.assertEquals(emptyList<Movie>(), value.movieList)
             if(key == HomeScreenState.MAIN_ITEM || key == HomeScreenState.POPULAR_MOVIES) {
-                //Assert.assertTrue(value.loadEvent is MovieListLoadEvent.LoadPopularMovies)
+                Assert.assertTrue(value.movieListType == MovieListType.PopularMovies)
             }
-            if(key == HomeScreenState.TOP_RATED_MOVIES) {
-                //Assert.assertTrue(value.loadEvent is MovieListLoadEvent.LoadTopRatedMovies)
+            else if(key == HomeScreenState.TOP_RATED_MOVIES) {
+                Assert.assertTrue(value.movieListType == MovieListType.TopRatedMovies)
             }
-            if(key == HomeScreenState.UPCOMING_MOVIES) {
-                //Assert.assertTrue(value.loadEvent is MovieListLoadEvent.LoadUpcomingMovies)
+            else if(key == HomeScreenState.UPCOMING_MOVIES) {
+                Assert.assertTrue(value.movieListType == MovieListType.UpcomingMovies)
             }
         }
     }
@@ -78,18 +71,21 @@ class HomeScreenViewModelTest {
             delay(500)
             Result.Success(data = movies)
         }
+        coEvery { repository.getUpcomingMovies(any(), any()) } returns Result.Success(data = movies)
+        coEvery { repository.getTopRatedMovies(any(), any()) } returns Result.Success(data = movies)
 
-        //viewModel.loadPopularMoviesAndMainItem()
+        viewModel.loadHomeScreenContent()
 
-        val mainItem = viewModel.state.value.movieLists[HomeScreenState.MAIN_ITEM]?.movieList
-        //Assert.assertTrue(mainItem is DataLoadState.Loading)
+        val mainItem = viewModel.state.value.movieLists[HomeScreenState.MAIN_ITEM]!!
+        Assert.assertNotNull(mainItem)
+        Assert.assertTrue(mainItem.isLoading)
         advanceUntilIdle()
         viewModel.state.test {
             val updatedState = awaitItem()
-            val mainItemAfterDelay = updatedState.movieLists[HomeScreenState.MAIN_ITEM]?.movieList
+            val mainItemAfterDelay = updatedState.movieLists[HomeScreenState.MAIN_ITEM]!!
 
-            //Assert.assertTrue(mainItemAfterDelay is DataLoadState.Loaded)
-            //Assert.assertEquals(movies, (mainItemAfterDelay as DataLoadState.Loaded).data)
+            Assert.assertFalse(mainItemAfterDelay.isLoading)
+            Assert.assertEquals(movies, mainItemAfterDelay.movieList)
 
             cancelAndIgnoreRemainingEvents()
         }
