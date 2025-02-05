@@ -2,10 +2,8 @@ package com.holparb.moviefinder.movies.presentation.home_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
-import com.holparb.moviefinder.core.domain.util.Error
-import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
+import com.holparb.moviefinder.core.domain.util.errors.DataError
 import com.holparb.moviefinder.core.domain.util.onError
 import com.holparb.moviefinder.core.domain.util.onSuccess
 import com.holparb.moviefinder.movies.domain.model.Movie
@@ -40,7 +38,7 @@ class HomeScreenViewModel @Inject constructor(
     private val _events = Channel<MovieEvent>()
     val events = _events.receiveAsFlow()
 
-    private var _error: Error? = null
+    private var _error: DataError? = null
 
     private fun updateMovieListState(key: String, movies: List<Movie> = emptyList(), isLoading: Boolean) {
         val newMap = _state.value.movieLists.toMutableMap()
@@ -60,7 +58,7 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun updateMovieListStateBasedOnResult(
         key: String,
-        result: Result<List<Movie>, Error>
+        result: Result<List<Movie>, DataError>
     ) {
         _error = null
         result
@@ -81,8 +79,8 @@ class HomeScreenViewModel @Inject constructor(
 
             if(_error != null) {
                 when(_error) {
-                    is NetworkError -> _events.send(MovieEvent.RemoteError(_error as NetworkError))
-                    is DatabaseError -> _events.send(MovieEvent.LocalError(_error as DatabaseError))
+                    is DataError.Network -> _events.send(MovieEvent.RemoteError((_error as DataError.Network).networkError))
+                    is DataError.Database -> _events.send(MovieEvent.LocalError((_error as DataError.Database).databaseError))
                     else -> {}
                 }
             }

@@ -3,9 +3,9 @@ package com.holparb.moviefinder.movies.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
-import com.holparb.moviefinder.core.domain.util.Error
 import com.holparb.moviefinder.core.domain.util.Result
+import com.holparb.moviefinder.core.domain.util.errors.DataError
+import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
 import com.holparb.moviefinder.core.domain.util.map
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
@@ -49,8 +49,8 @@ class MovieRepositoryImpl @Inject constructor (
         movieListType: MovieListType,
         page: Int,
         region: String
-    ): Result<List<Movie>, Error> {
-        val movies = moviesDataSource.getMoviesList(
+    ): Result<List<Movie>, DataError> {
+        val result = moviesDataSource.getMoviesList(
             movieListType = movieListType,
             page = page,
             region = region
@@ -59,18 +59,21 @@ class MovieRepositoryImpl @Inject constructor (
                 try {
                     saveMovieDtoToDatabase(movieListItemDto = movieListItemDto, movieListType = movieListType)
                 } catch(e: Exception) {
-                    return Result.Error(DatabaseError.UPSERT_ERROR)
+                    return Result.Error(DataError.Database(databaseError = DatabaseError.UPSERT_ERROR))
                 }
                 movieListItemDto.toMovie()
             }
         }
-        return movies
+        return when(result) {
+            is Result.Error -> Result.Error(DataError.Network(result.error))
+            is Result.Success -> Result.Success(result.data)
+        }
     }
 
     override suspend fun getPopularMovies(
         page: Int,
         region: String
-    ): Result<List<Movie>, Error> {
+    ): Result<List<Movie>, DataError> {
         return getMovies(
             movieListType = MovieListType.PopularMovies,
             page = page,
@@ -90,16 +93,17 @@ class MovieRepositoryImpl @Inject constructor (
         return getMoviesWithPagination(upcomingMoviesPager)
     }
 
-    override suspend fun getMovieDetails(movieId: Int): Result<Movie, Error> {
-        return moviesDataSource.getMovieDetails(movieId).map {
-            it.toMovie()
+    override suspend fun getMovieDetails(movieId: Int): Result<Movie, DataError> {
+        return when(val result = moviesDataSource.getMovieDetails(movieId)) {
+            is Result.Error -> Result.Error(DataError.Network(result.error))
+            is Result.Success -> Result.Success(result.data.toMovie())
         }
     }
 
     override suspend fun getTopRatedMovies(
         page: Int,
         region: String
-    ): Result<List<Movie>, Error> {
+    ): Result<List<Movie>, DataError> {
         return getMovies(
             movieListType = MovieListType.TopRatedMovies,
             page = page,
@@ -110,7 +114,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getUpcomingMovies(
         page: Int,
         region: String
-    ): Result<List<Movie>, Error> {
+    ): Result<List<Movie>, DataError> {
         return getMovies(
             movieListType = MovieListType.UpcomingMovies,
             page = page,
