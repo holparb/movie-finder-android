@@ -12,10 +12,8 @@ import com.holparb.moviefinder.movies.domain.util.MovieEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,14 +24,11 @@ class HomeScreenViewModel @Inject constructor(
 ): ViewModel() {
 
     private val _state = MutableStateFlow(HomeScreenState())
-    val state = _state
-        .onStart {
-            loadHomeScreenContent()
-        }.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
-            HomeScreenState()
-        )
+    val state = _state.asStateFlow()
+
+    init {
+        loadHomeScreenContent()
+    }
 
     private val _events = Channel<MovieEvent>()
     val events = _events.receiveAsFlow()
@@ -71,39 +66,44 @@ class HomeScreenViewModel @Inject constructor(
             }
     }
 
-    fun loadHomeScreenContent() {
+    private fun loadHomeScreenContent() {
+        loadPopularMoviesAndMainItem()
+        loadTopRatedMovies()
+        loadUpcomingMovies()
         viewModelScope.launch {
-            loadPopularMoviesAndMainItem()
-            loadTopRatedMovies()
-            loadUpcomingMovies()
-
             if(_error != null) {
                 when(_error) {
                     is DataError.Network -> _events.send(MovieEvent.RemoteError((_error as DataError.Network).networkError))
                     is DataError.Database -> _events.send(MovieEvent.LocalError((_error as DataError.Database).databaseError))
-                    else -> {}
+                    else -> { /* _error can not be null */ }
                 }
             }
         }
     }
 
-    private suspend fun loadPopularMoviesAndMainItem() {
+    private fun loadPopularMoviesAndMainItem() {
         updateMovieListState(HomeScreenState.POPULAR_MOVIES, isLoading = true)
         updateMovieListState(HomeScreenState.MAIN_ITEM, isLoading = true)
-        val result = repository.getPopularMovies()
-        updateMovieListStateBasedOnResult(HomeScreenState.POPULAR_MOVIES, result)
-        updateMovieListStateBasedOnResult(HomeScreenState.MAIN_ITEM, result)
+        viewModelScope.launch {
+            val result = repository.getPopularMovies()
+            updateMovieListStateBasedOnResult(HomeScreenState.POPULAR_MOVIES, result)
+            updateMovieListStateBasedOnResult(HomeScreenState.MAIN_ITEM, result)
+        }
     }
 
-    private suspend fun loadTopRatedMovies() {
+    private fun loadTopRatedMovies() {
         updateMovieListState(HomeScreenState.TOP_RATED_MOVIES, isLoading = true)
-        val result = repository.getTopRatedMovies()
-        updateMovieListStateBasedOnResult(HomeScreenState.TOP_RATED_MOVIES, result)
+        viewModelScope.launch {
+            val result = repository.getTopRatedMovies()
+            updateMovieListStateBasedOnResult(HomeScreenState.TOP_RATED_MOVIES, result)
+        }
     }
 
-    private suspend fun loadUpcomingMovies() {
+    private fun loadUpcomingMovies() {
         updateMovieListState(HomeScreenState.UPCOMING_MOVIES, isLoading = true)
-        val result = repository.getUpcomingMovies()
-        updateMovieListStateBasedOnResult(HomeScreenState.UPCOMING_MOVIES, result)
+        viewModelScope.launch {
+            val result = repository.getUpcomingMovies()
+            updateMovieListStateBasedOnResult(HomeScreenState.UPCOMING_MOVIES, result)
+        }
     }
 }

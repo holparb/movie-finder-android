@@ -2,9 +2,10 @@ package com.holparb.moviefinder.movies.data.repository
 
 import android.util.Log
 import androidx.paging.Pager
+import com.holparb.moviefinder.core.domain.util.Result
+import com.holparb.moviefinder.core.domain.util.errors.DataError
 import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
 import com.holparb.moviefinder.core.domain.util.errors.NetworkError
-import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
 import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
@@ -76,7 +77,7 @@ class MovieRepositoryTest {
         val result = repository.getPopularMovies()
 
         Assert.assertTrue(result is Result.Error)
-        Assert.assertTrue((result as Result.Error).error == NetworkError.SERVER_ERROR)
+        Assert.assertTrue((result as Result.Error).error == DataError.Network(NetworkError.SERVER_ERROR))
     }
 
     @Test
@@ -87,6 +88,7 @@ class MovieRepositoryTest {
         val result = repository.getPopularMovies()
 
         Assert.assertTrue(result is Result.Error)
-        Assert.assertTrue((result as Result.Error).error == DatabaseError.UPSERT_ERROR)
+        Assert.assertTrue((result as Result.Error).error == DataError.Database(DatabaseError.UPSERT_ERROR))
+
     }
 }
