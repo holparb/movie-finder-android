@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movies.presentation.see_more
+package com.holparb.moviefinder.movies.presentation.see_more_screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.holparb.moviefinder.movies.domain.model.MovieListType
-import com.holparb.moviefinder.movies.presentation.see_more.components.MovieVerticalList
+import com.holparb.moviefinder.movies.presentation.see_more_screen.components.MovieVerticalList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

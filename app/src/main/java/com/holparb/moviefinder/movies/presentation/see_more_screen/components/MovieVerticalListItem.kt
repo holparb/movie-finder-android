@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movies.presentation.see_more.components
+package com.holparb.moviefinder.movies.presentation.see_more_screen.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
