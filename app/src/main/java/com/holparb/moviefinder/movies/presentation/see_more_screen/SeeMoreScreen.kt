@@ -55,7 +55,7 @@ fun SeeMoreScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description"
+                            contentDescription = "Navigate back"
                         )
                     }
                 },

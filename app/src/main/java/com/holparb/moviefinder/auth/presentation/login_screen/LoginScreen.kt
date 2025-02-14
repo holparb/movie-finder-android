@@ -28,5 +28,4 @@ fun LoginScreen(
             modifier = Modifier.padding(contentPadding)
         )
     }
-
 }
