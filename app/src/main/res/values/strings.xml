@@ -17,4 +17,5 @@
     <string name="loading_description">Loading</string>
     <string name="loaded_description">Loaded</string>
     <string name="see_movie_details_description">See movie details</string>
+    <string name="watchlist_not_logged_in_message">Log in to your TMDB profile to check and edit your watchlist</string>
 </resources>
