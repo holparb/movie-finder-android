@@ -40,7 +40,11 @@ fun Navigation(navController: NavHostController) {
             }
             composable<Destination.WatchlistDestination> {
                 WatchListScreen(
-                    navigateToLogin = { navController.navigate(Destination.LoginScreenDestination) }
+                    navigateToLogin = {
+                        navController.navigate(Destination.LoginScreenDestination) {
+                            popUpTo(Destination.WatchlistDestination) { inclusive = true }
+                        }
+                    }
                 )
             }
             composable<Destination.SearchScreenDestination> {
