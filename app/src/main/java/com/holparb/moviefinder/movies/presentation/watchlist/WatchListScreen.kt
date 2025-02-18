@@ -24,7 +24,6 @@ fun WatchListScreen(
 ) {
     val watchlistViewModel = hiltViewModel<WatchlistViewModel>()
     val state by watchlistViewModel.state.collectAsStateWithLifecycle()
-    val isUserLoggedIn by watchlistViewModel.isUserLoggedIn.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
@@ -46,10 +45,8 @@ fun WatchListScreen(
     ) { paddingValues ->
         WatchlistBody(
             state = state,
-            isUserLoggedIn = isUserLoggedIn,
             navigateToLogin = navigateToLogin,
             modifier = Modifier.padding(paddingValues)
         )
     }
-
 }

@@ -14,4 +14,5 @@ interface MovieRepository {
     suspend fun getTopRatedMoviesWithPagination(): Flow<PagingData<Movie>>
     suspend fun getUpcomingWithPagination(): Flow<PagingData<Movie>>
     suspend fun getMovieDetails(movieId: Int): Result<Movie, DataError>
+    suspend fun getWatchlist(sessionId: String, page: Int = 1): Result<List<Movie>, DataError.Network>
 }

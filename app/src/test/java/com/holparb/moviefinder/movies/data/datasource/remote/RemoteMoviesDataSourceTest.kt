@@ -1,7 +1,7 @@
 package com.holparb.moviefinder.movies.data.datasource.remote
 
-import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
+import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.testutils.JsonReader
 import io.ktor.client.HttpClient
@@ -42,13 +42,6 @@ class RemoteMoviesDataSourceTest {
     @Before
     fun setup() {
         mockEngine = MockEngine { request ->
-            if(request.url.encodedPath.contains("/movie/").not()) {
-                respond(
-                    content = "Error",
-                    status = HttpStatusCode.BadRequest,
-                    headers = headersOf(HttpHeaders.ContentType, "application/json")
-                )
-            }
             val statusCode = if(isSuccess == true) HttpStatusCode.OK else HttpStatusCode.InternalServerError
             val content = if(isSuccess == true) JsonReader.readJsonFile("MovieListResponse.json") else ""
             respond(
@@ -80,9 +73,25 @@ class RemoteMoviesDataSourceTest {
     }
 
     @Test
-    fun data_source_fails_with_server_error() = runBlocking {
+    fun get_movie_list_data_source_fails_with_server_error() = runBlocking {
         givenFailure()
         val response = remoteMoviesDataSource.getMoviesList(movieListType = MovieListType.PopularMovies)
+        Assert.assertTrue(response is Result.Error)
+        Assert.assertEquals(NetworkError.SERVER_ERROR, (response as Result.Error).error)
+    }
+
+    @Test
+    fun get_watchlist_is_successful() = runBlocking {
+        givenSuccess()
+        val response = remoteMoviesDataSource.getWatchlist("session_id")
+        Assert.assertTrue(response is Result.Success)
+        Assert.assertEquals(20, (response as Result.Success).data.size)
+    }
+
+    @Test
+    fun get_watchlist_fails_with_server_error() = runBlocking {
+        givenFailure()
+        val response = remoteMoviesDataSource.getWatchlist("session_id")
         Assert.assertTrue(response is Result.Error)
         Assert.assertEquals(NetworkError.SERVER_ERROR, (response as Result.Error).error)
     }
