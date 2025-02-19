@@ -67,10 +67,15 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun loadHomeScreenContent() {
-        loadPopularMoviesAndMainItem()
-        loadTopRatedMovies()
-        loadUpcomingMovies()
+        updateMovieListState(HomeScreenState.POPULAR_MOVIES, isLoading = true)
+        updateMovieListState(HomeScreenState.MAIN_ITEM, isLoading = true)
+        updateMovieListState(HomeScreenState.TOP_RATED_MOVIES, isLoading = true)
+        updateMovieListState(HomeScreenState.UPCOMING_MOVIES, isLoading = true)
         viewModelScope.launch {
+            loadPopularMoviesAndMainItem()
+            loadTopRatedMovies()
+            loadUpcomingMovies()
+
             if(_error != null) {
                 when(_error) {
                     is DataError.Network -> _events.send(MovieEvent.RemoteError((_error as DataError.Network).networkError))
@@ -81,29 +86,19 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun loadPopularMoviesAndMainItem() {
-        updateMovieListState(HomeScreenState.POPULAR_MOVIES, isLoading = true)
-        updateMovieListState(HomeScreenState.MAIN_ITEM, isLoading = true)
-        viewModelScope.launch {
-            val result = repository.getPopularMovies()
-            updateMovieListStateBasedOnResult(HomeScreenState.POPULAR_MOVIES, result)
-            updateMovieListStateBasedOnResult(HomeScreenState.MAIN_ITEM, result)
-        }
+    private suspend fun loadPopularMoviesAndMainItem() {
+        val result = repository.getPopularMovies()
+        updateMovieListStateBasedOnResult(HomeScreenState.POPULAR_MOVIES, result)
+        updateMovieListStateBasedOnResult(HomeScreenState.MAIN_ITEM, result)
     }
 
-    private fun loadTopRatedMovies() {
-        updateMovieListState(HomeScreenState.TOP_RATED_MOVIES, isLoading = true)
-        viewModelScope.launch {
-            val result = repository.getTopRatedMovies()
-            updateMovieListStateBasedOnResult(HomeScreenState.TOP_RATED_MOVIES, result)
-        }
+    private suspend fun loadTopRatedMovies() {
+        val result = repository.getTopRatedMovies()
+        updateMovieListStateBasedOnResult(HomeScreenState.TOP_RATED_MOVIES, result)
     }
 
-    private fun loadUpcomingMovies() {
-        updateMovieListState(HomeScreenState.UPCOMING_MOVIES, isLoading = true)
-        viewModelScope.launch {
-            val result = repository.getUpcomingMovies()
-            updateMovieListStateBasedOnResult(HomeScreenState.UPCOMING_MOVIES, result)
-        }
+    private suspend fun loadUpcomingMovies() {
+        val result = repository.getUpcomingMovies()
+        updateMovieListStateBasedOnResult(HomeScreenState.UPCOMING_MOVIES, result)
     }
 }

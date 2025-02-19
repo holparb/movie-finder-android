@@ -4,13 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
-import com.holparb.moviefinder.core.domain.util.errors.NetworkError
+import com.holparb.moviefinder.core.domain.util.errors.DataError
 import com.holparb.moviefinder.core.domain.util.onError
 import com.holparb.moviefinder.core.domain.util.onSuccess
+import com.holparb.moviefinder.core.navigation.Destination
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.domain.util.MovieEvent
-import com.holparb.moviefinder.core.navigation.Destination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -58,11 +57,9 @@ class MovieDetailsViewModel @Inject constructor(
                         isLoading = false
                     )
                     when(error) {
-                        is NetworkError -> _events.send(MovieEvent.RemoteError(error))
-                        is DatabaseError -> _events.send(MovieEvent.LocalError(error))
-                        else -> {}
+                        is DataError.Network -> _events.send(MovieEvent.RemoteError(error.networkError))
+                        is DataError.Database -> _events.send(MovieEvent.LocalError(error.databaseError))
                     }
-                    _events.send(MovieEvent.RemoteError(NetworkError.SERVER_ERROR))
                 }
         }
 

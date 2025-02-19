@@ -7,9 +7,9 @@ import com.holparb.moviefinder.auth.domain.repository.AuthRepository
 import com.holparb.moviefinder.core.domain.util.LocalEncryptedStorage
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.errors.AuthError
+import com.holparb.moviefinder.core.domain.util.errors.LoginError
 import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
@@ -27,18 +27,6 @@ class AuthRepositoryTest {
         authDataSource = mockk()
         localEncryptedStorage = mockk()
         authRepository = AuthRepositoryImpl(authDataSource, localEncryptedStorage)
-    }
-
-    @Test
-    fun stored_session_id_is_not_null() {
-        every { localEncryptedStorage.getSessionId() } returns "123456789"
-        Assert.assertTrue(authRepository.isUserLoggedIn())
-    }
-
-    @Test
-    fun stored_session_id_is_null() {
-        every { localEncryptedStorage.getSessionId() } returns null
-        Assert.assertFalse(authRepository.isUserLoggedIn())
     }
 
     @Test
@@ -69,7 +57,7 @@ class AuthRepositoryTest {
         coEvery { authDataSource.getRequestToken() } returns Result.Error(networkError)
         val result = authRepository.login("username", "password")
         Assert.assertTrue(result is Result.Error)
-        Assert.assertEquals(networkError, (result as Result.Error).error)
+        Assert.assertEquals(LoginError.Network(networkError), (result as Result.Error).error)
     }
 
     @Test
@@ -77,7 +65,7 @@ class AuthRepositoryTest {
         coEvery { authDataSource.getRequestToken() } returns Result.Success(RequestTokenDto(success = false, "", ""))
         val result = authRepository.login("username", "password")
         Assert.assertTrue(result is Result.Error)
-        Assert.assertEquals(AuthError.TOKEN_REQUEST_ERROR, (result as Result.Error).error)
+        Assert.assertEquals(LoginError.Auth(AuthError.TOKEN_REQUEST_ERROR), (result as Result.Error).error)
     }
 
     @Test
@@ -87,7 +75,7 @@ class AuthRepositoryTest {
         coEvery { authDataSource.validateToken(any(), any(), any()) } returns Result.Error(networkError)
         val result = authRepository.login("username", "password")
         Assert.assertTrue(result is Result.Error)
-        Assert.assertEquals(networkError, (result as Result.Error).error)
+        Assert.assertEquals(LoginError.Network(networkError), (result as Result.Error).error)
     }
 
     @Test
@@ -96,7 +84,7 @@ class AuthRepositoryTest {
         coEvery { authDataSource.validateToken(any(), any(), any()) } returns Result.Success(RequestTokenDto(success = false, "", ""))
         val result = authRepository.login("username", "password")
         Assert.assertTrue(result is Result.Error)
-        Assert.assertEquals(AuthError.INVALID_LOGIN_PARAMETERS, (result as Result.Error).error)
+        Assert.assertEquals(LoginError.Auth(AuthError.INVALID_LOGIN_PARAMETERS), (result as Result.Error).error)
     }
 
     @Test
@@ -108,7 +96,7 @@ class AuthRepositoryTest {
         coEvery { authDataSource.createSession(requestTokenDto) } returns Result.Error(networkError)
         val result = authRepository.login("username", "password")
         Assert.assertTrue(result is Result.Error)
-        Assert.assertEquals(networkError, (result as Result.Error).error)
+        Assert.assertEquals(LoginError.Network(networkError), (result as Result.Error).error)
     }
 
     @Test
@@ -119,6 +107,6 @@ class AuthRepositoryTest {
         coEvery { authDataSource.createSession(requestTokenDto) } returns Result.Success(SessionDto(success = false, sessionId = ""))
         val result = authRepository.login("username", "password")
         Assert.assertTrue(result is Result.Error)
-        Assert.assertEquals(AuthError.SESSION_CREATION_ERROR, (result as Result.Error).error)
+        Assert.assertEquals(LoginError.Auth(AuthError.SESSION_CREATION_ERROR), (result as Result.Error).error)
     }
 }

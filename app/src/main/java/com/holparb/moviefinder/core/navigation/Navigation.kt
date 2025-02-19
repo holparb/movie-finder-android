@@ -11,7 +11,7 @@ import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.details.MovieDetailsScreen
 import com.holparb.moviefinder.movies.presentation.home_screen.HomeScreen
 import com.holparb.moviefinder.movies.presentation.search.SearchScreen
-import com.holparb.moviefinder.movies.presentation.see_more.SeeMoreScreen
+import com.holparb.moviefinder.movies.presentation.see_more_screen.SeeMoreScreen
 import com.holparb.moviefinder.movies.presentation.watchlist.WatchListScreen
 import kotlinx.serialization.Serializable
 
@@ -40,7 +40,11 @@ fun Navigation(navController: NavHostController) {
             }
             composable<Destination.WatchlistDestination> {
                 WatchListScreen(
-                    navigateToLogin = { navController.navigate(Destination.LoginScreenDestination) }
+                    navigateToLogin = {
+                        navController.navigate(Destination.LoginScreenDestination) {
+                            popUpTo(Destination.WatchlistDestination) { inclusive = true }
+                        }
+                    }
                 )
             }
             composable<Destination.SearchScreenDestination> {

@@ -58,7 +58,7 @@ class MovieRepositoryImpl @Inject constructor (
             it.map { movieListItemDto ->
                 try {
                     saveMovieDtoToDatabase(movieListItemDto = movieListItemDto, movieListType = movieListType)
-                } catch(e: Exception) {
+                } catch(_: Exception) {
                     return Result.Error(DataError.Database(databaseError = DatabaseError.UPSERT_ERROR))
                 }
                 movieListItemDto.toMovie()
@@ -97,6 +97,24 @@ class MovieRepositoryImpl @Inject constructor (
         return when(val result = moviesDataSource.getMovieDetails(movieId)) {
             is Result.Error -> Result.Error(DataError.Network(result.error))
             is Result.Success -> Result.Success(result.data.toMovie())
+        }
+    }
+
+    override suspend fun getWatchlist(
+        sessionId: String,
+        page: Int
+    ): Result<List<Movie>, DataError.Network> {
+        val result = moviesDataSource.getWatchlist(
+            sessionId = sessionId, page = page
+        ).map { movieListItemDtos ->
+            movieListItemDtos.map { movieListItemDto ->
+                movieListItemDto.toMovie()
+            }
+        }
+
+        return when(result) {
+            is Result.Error -> Result.Error(DataError.Network(result.error))
+            is Result.Success -> Result.Success(result.data)
         }
     }
 
