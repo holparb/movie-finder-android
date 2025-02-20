@@ -46,6 +46,7 @@ fun WatchListScreen(
         )
         WatchlistBody(
             state = state,
+            events = watchlistViewModel.events,
             navigateToLogin = navigateToLogin,
         )
     }

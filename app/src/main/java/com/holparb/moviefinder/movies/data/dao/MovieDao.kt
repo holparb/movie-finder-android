@@ -29,4 +29,7 @@ interface MovieDao {
 
     @Query("SELECT * FROM movies WHERE is_upcoming")
     fun getUpcomingMoviesWithPagination(): PagingSource<Int, MovieEntity>
+
+    @Query("SELECT * FROM movies WHERE is_watchlist")
+    fun getWatchlist(): Flow<List<MovieEntity>>
 }

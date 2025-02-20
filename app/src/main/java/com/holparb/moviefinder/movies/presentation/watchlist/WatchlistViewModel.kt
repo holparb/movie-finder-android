@@ -8,9 +8,11 @@ import com.holparb.moviefinder.core.domain.util.onSuccess
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.presentation.see_more_screen.components.toMovieVerticalListItemUi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -40,6 +42,9 @@ class WatchlistViewModel @Inject constructor(
             WatchlistState()
         )
 
+    private val _events = Channel<WatchlistEvent>()
+    val events = _events.receiveAsFlow()
+
     private fun loadWatchlist() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
@@ -54,8 +59,9 @@ class WatchlistViewModel @Inject constructor(
                         )
                     }
                 }
-                .onError {
-                    println(it.networkError.toString())
+                .onError { dataError ->
+                    _state.update { it.copy(isLoading = false) }
+                    _events.send(WatchlistEvent.WatchlistError(dataError))
                 }
         }
     }

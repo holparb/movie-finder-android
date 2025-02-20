@@ -25,5 +25,7 @@ data class MovieEntity (
     @ColumnInfo(name = "is_top_rated")
     val isTopRated: Boolean = false,
     @ColumnInfo(name = "is_upcoming")
-    val isUpcoming: Boolean = false
+    val isUpcoming: Boolean = false,
+    @ColumnInfo(name = "is_watchlist")
+    val isWatchlist: Boolean = false
 )

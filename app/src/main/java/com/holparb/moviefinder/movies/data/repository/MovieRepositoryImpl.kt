@@ -103,11 +103,16 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getWatchlist(
         sessionId: String,
         page: Int
-    ): Result<List<Movie>, DataError.Network> {
+    ): Result<List<Movie>, DataError> {
         val result = moviesDataSource.getWatchlist(
             sessionId = sessionId, page = page
         ).map { movieListItemDtos ->
             movieListItemDtos.map { movieListItemDto ->
+                try {
+                    movieDao.upsertMovie(movieListItemDto.toMovieEntity(isWatchlist = true))
+                } catch(_: Exception) {
+                    return Result.Error(DataError.Database(DatabaseError.UPSERT_ERROR))
+                }
                 movieListItemDto.toMovie()
             }
         }
