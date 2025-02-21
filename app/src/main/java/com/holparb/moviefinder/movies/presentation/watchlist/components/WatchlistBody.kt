@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.holparb.moviefinder.core.domain.util.errors.DataError
 import com.holparb.moviefinder.core.presentation.util.ObserveAsEvents
 import com.holparb.moviefinder.core.presentation.util.toString
+import com.holparb.moviefinder.movies.presentation.watchlist.WatchlistAction
 import com.holparb.moviefinder.movies.presentation.watchlist.WatchlistEvent
 import com.holparb.moviefinder.movies.presentation.watchlist.WatchlistState
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun WatchlistBody(
     state: WatchlistState,
+    onAction: (WatchlistAction) -> Unit,
     events: Flow<WatchlistEvent>,
     navigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
@@ -44,7 +46,8 @@ fun WatchlistBody(
             WatchlistNotLoggedIn(navigateToLogin = navigateToLogin)
         } else {
             Watchlist(
-                state = state
+                state = state,
+                onAction = onAction
             )
         }
     }
