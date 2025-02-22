@@ -15,7 +15,7 @@ lifecycleViewmodelCompose = "2.8.7"
 mockk = "1.13.12"
 paging = "3.3.4"
 ktor = "3.0.1"
-dagger = "2.51.1"
+dagger = "2.55"
 hilt = "1.2.0"
 hiltNavigationCompose = "1.2.0"
 composeNavigation = "2.8.5"
@@ -53,8 +53,6 @@ androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-ru
 androidx-compose-material3-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "material3-adaptive" }
 dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger" }
-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt" }
-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
