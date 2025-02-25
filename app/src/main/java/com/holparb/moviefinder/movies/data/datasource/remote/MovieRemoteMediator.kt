@@ -73,11 +73,12 @@ class MovieRemoteMediator(
                                 lastUpdated = System.currentTimeMillis()
                             )
                         )
-                        val movieEntities = movieListResponse.data.map {
+                        val movieEntities = movieListResponse.data.map { movieListItemDto ->
+                            val entity = movieDatabase.movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
                             when(movieListType) {
-                                MovieListType.PopularMovies -> it.toMovieEntity(isPopular = true)
-                                MovieListType.TopRatedMovies -> it.toMovieEntity(isTopRated = true)
-                                MovieListType.UpcomingMovies -> it.toMovieEntity(isUpcoming = true)
+                                MovieListType.PopularMovies -> entity.copy(isPopular = true)
+                                MovieListType.TopRatedMovies -> entity.copy(isTopRated = true)
+                                MovieListType.UpcomingMovies -> entity.copy(isUpcoming = true)
                             }
                         }
                         movieDatabase.movieDao.upsertMovies(movieEntities)

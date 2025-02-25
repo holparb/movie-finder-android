@@ -30,10 +30,12 @@ class WatchlistViewModel @Inject constructor(
             _state.update { it.copy(isNewPageLoading = isLoading) }
         },
         onRequest = { page ->
-            movieRepository.getWatchlist(
+            val result = movieRepository.getWatchlist(
                 sessionId = localEncryptedStorage.getSessionId()!!,
                 page = page
             )
+            println(result.toString())
+            result
         },
         onError = { error ->
             _events.send(WatchlistEvent.WatchlistError(error))
@@ -58,6 +60,7 @@ class WatchlistViewModel @Inject constructor(
     private val _state = MutableStateFlow(WatchlistState())
     val state = _state
         .onStart {
+            localEncryptedStorage.saveSessionId("dad4b9be4a1aa1d53f8cf205fe084045bf2fa30e")
             val isUserLoggedIn = localEncryptedStorage.getSessionId() != null
             _state.update {
                 it.copy(

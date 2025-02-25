@@ -1,15 +1,16 @@
 package com.holparb.moviefinder.movies.data.repository
 
+import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.withTransaction
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.errors.DataError
 import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
 import com.holparb.moviefinder.core.domain.util.map
-import com.holparb.moviefinder.movies.data.dao.MovieDao
+import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
-import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovie
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
@@ -23,19 +24,11 @@ import javax.inject.Named
 
 class MovieRepositoryImpl @Inject constructor (
     private val moviesDataSource: RemoteMoviesDataSource,
-    private val movieDao: MovieDao,
+    private val movieDatabase: MovieDatabase,
     @Named("PopularMoviesPager") private val popularMoviesPager: Pager<Int, MovieEntity>,
     @Named("TopRatedMoviesPager") private val topRatedMoviesPager: Pager<Int, MovieEntity>,
     @Named("UpcomingMoviesPager") private val upcomingMoviesPager: Pager<Int, MovieEntity>
 ): MovieRepository {
-    private suspend fun saveMovieDtoToDatabase(movieListItemDto: MovieListItemDto, movieListType: MovieListType) {
-        val entity = when(movieListType) {
-            MovieListType.PopularMovies -> movieListItemDto.toMovieEntity(isPopular = true)
-            MovieListType.TopRatedMovies -> movieListItemDto.toMovieEntity(isTopRated = true)
-            MovieListType.UpcomingMovies -> movieListItemDto.toMovieEntity(isUpcoming = true)
-        }
-        movieDao.upsertMovie(entity)
-    }
 
     private fun getMoviesWithPagination(pager: Pager<Int, MovieEntity>): Flow<PagingData<Movie>> {
         return pager.flow.map { pagingData ->
@@ -45,23 +38,33 @@ class MovieRepositoryImpl @Inject constructor (
         }
     }
 
-    private suspend fun getMovies(
+    private suspend fun getMoviesFromRemoteDataSource(
         movieListType: MovieListType,
         page: Int,
         region: String
     ): Result<List<Movie>, DataError> {
+        val movieEntities: MutableList<MovieEntity> = mutableListOf()
         val result = moviesDataSource.getMoviesList(
             movieListType = movieListType,
             page = page,
             region = region
         ).map {
             it.map { movieListItemDto ->
-                try {
-                    saveMovieDtoToDatabase(movieListItemDto = movieListItemDto, movieListType = movieListType)
-                } catch(_: Exception) {
-                    return Result.Error(DataError.Database(databaseError = DatabaseError.UPSERT_ERROR))
+                val movieEntity = movieDatabase.movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
+                val movieEntityToAdd = when(movieListType) {
+                    MovieListType.PopularMovies -> movieEntity.copy(isPopular = true)
+                    MovieListType.TopRatedMovies -> movieEntity.copy(isTopRated = true)
+                    MovieListType.UpcomingMovies -> movieEntity.copy(isUpcoming = true)
                 }
+                movieEntities.add(movieEntityToAdd)
                 movieListItemDto.toMovie()
+            }
+        }
+        movieDatabase.withTransaction {
+            try {
+                movieDatabase.movieDao.upsertMovies(movieEntities)
+            } catch(e: Exception) {
+                Log.e(this.javaClass.simpleName, e.toString())
             }
         }
         return when(result) {
@@ -74,7 +77,7 @@ class MovieRepositoryImpl @Inject constructor (
         page: Int,
         region: String
     ): Result<List<Movie>, DataError> {
-        return getMovies(
+        return getMoviesFromRemoteDataSource(
             movieListType = MovieListType.PopularMovies,
             page = page,
             region = region
@@ -100,26 +103,61 @@ class MovieRepositoryImpl @Inject constructor (
         }
     }
 
-    override suspend fun getWatchlist(
+    private suspend fun getWatchlistFromDatabase(page: Int): Result<List<Movie>, DataError.Database> {
+        return try {
+            val movies = movieDatabase.movieDao.getWatchlist(page - 1).map {
+                it.toMovie()
+            }
+            Result.Success(movies)
+        } catch (e: Exception) {
+            Log.e(this.javaClass.simpleName, e.toString())
+            Result.Error(DataError.Database(DatabaseError.FETCH_ERROR))
+        }
+    }
+
+    private suspend fun getWatchlistFromRemoteDataSource(
         sessionId: String,
         page: Int
-    ): Result<List<Movie>, DataError> {
+    ): Result<List<Movie>, DataError.Network> {
+        val movieEntities: MutableList<MovieEntity> = mutableListOf()
         val result = moviesDataSource.getWatchlist(
             sessionId = sessionId, page = page
         ).map { movieListItemDtos ->
             movieListItemDtos.map { movieListItemDto ->
-                try {
-                    movieDao.upsertMovie(movieListItemDto.toMovieEntity(isWatchlist = true))
-                } catch(_: Exception) {
-                    return Result.Error(DataError.Database(DatabaseError.UPSERT_ERROR))
-                }
+                val movieEntity = movieDatabase.movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
+                movieEntities.add(movieEntity.copy(isWatchlist = true))
                 movieListItemDto.toMovie()
             }
         }
-
+        movieDatabase.withTransaction {
+            try {
+                movieDatabase.movieDao.upsertMovies(movieEntities)
+            } catch(e: Exception) {
+                Log.e(this.javaClass.simpleName, e.toString())
+            }
+        }
         return when(result) {
             is Result.Error -> Result.Error(DataError.Network(result.error))
             is Result.Success -> Result.Success(result.data)
+        }
+    }
+
+    override suspend fun getWatchlist(
+        sessionId: String,
+        page: Int
+    ): Result<List<Movie>, DataError> {
+        when(val result = getWatchlistFromDatabase(page)) {
+            is Result.Error -> return Result.Error(DataError.Database(result.error.databaseError))
+            is Result.Success -> {
+                return if(result.data.isNotEmpty()) {
+                    Result.Success(result.data)
+                } else {
+                    when(val remoteResult = getWatchlistFromRemoteDataSource(sessionId = sessionId, page = page)) {
+                        is Result.Error -> Result.Error(remoteResult.error)
+                        is Result.Success -> getWatchlistFromDatabase(page)
+                    }
+                }
+            }
         }
     }
 
@@ -127,7 +165,7 @@ class MovieRepositoryImpl @Inject constructor (
         page: Int,
         region: String
     ): Result<List<Movie>, DataError> {
-        return getMovies(
+        return getMoviesFromRemoteDataSource(
             movieListType = MovieListType.TopRatedMovies,
             page = page,
             region = region
@@ -138,7 +176,7 @@ class MovieRepositoryImpl @Inject constructor (
         page: Int,
         region: String
     ): Result<List<Movie>, DataError> {
-        return getMovies(
+        return getMoviesFromRemoteDataSource(
             movieListType = MovieListType.UpcomingMovies,
             page = page,
             region = region

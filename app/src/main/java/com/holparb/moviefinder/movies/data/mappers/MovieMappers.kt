@@ -35,12 +35,7 @@ fun MovieListItemDto.toMovie(): Movie {
     )
 }
 
-fun MovieListItemDto.toMovieEntity(
-    isPopular: Boolean = false,
-    isTopRated: Boolean = false,
-    isUpcoming: Boolean = false,
-    isWatchlist: Boolean = false
-): MovieEntity {
+fun MovieListItemDto.toMovieEntity(): MovieEntity {
     return MovieEntity(
         id = id,
         title = title,
@@ -50,11 +45,7 @@ fun MovieListItemDto.toMovieEntity(
         popularity = popularity,
         posterPath = posterPath,
         backdropPath = backdropPath,
-        genreIds = genreIds,
-        isPopular = isPopular,
-        isTopRated = isTopRated,
-        isUpcoming = isUpcoming,
-        isWatchlist = isWatchlist
+        genreIds = genreIds
     )
 }
 

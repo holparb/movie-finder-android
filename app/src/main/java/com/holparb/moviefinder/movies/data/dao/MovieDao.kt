@@ -5,7 +5,6 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MovieDao {
@@ -18,8 +17,11 @@ interface MovieDao {
     @Query("DELETE FROM movies")
     suspend fun clearAll()
 
+    @Query("SELECT * FROM movies WHERE id = :id")
+    suspend fun getMovieById(id: Int): MovieEntity?
+
     @Query("SELECT * FROM movies WHERE is_popular ORDER BY release_date DESC LIMIT 20")
-    fun getPopularMoviesForHomeScreen(): Flow<List<MovieEntity>>
+    suspend fun getPopularMoviesForHomeScreen(): List<MovieEntity>
 
     @Query("SELECT * FROM movies WHERE is_popular ORDER BY popularity DESC")
     fun getPopularMoviesWithPagination():PagingSource<Int, MovieEntity>
@@ -30,6 +32,6 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE is_upcoming")
     fun getUpcomingMoviesWithPagination(): PagingSource<Int, MovieEntity>
 
-    @Query("SELECT * FROM movies WHERE is_watchlist")
-    fun getWatchlist(): Flow<List<MovieEntity>>
+    @Query("SELECT * FROM movies WHERE is_watchlist LIMIT 20 OFFSET :offset")
+    suspend fun getWatchlist(offset: Int = 0): List<MovieEntity>
 }
