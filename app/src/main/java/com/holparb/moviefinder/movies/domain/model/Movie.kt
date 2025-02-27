@@ -11,6 +11,6 @@ data class Movie(
     val backdropPath: String? = null,
     val genres: List<Genre> = emptyList(),
     val rating: Double? = null,
-    val popularity: Double = 0.0,
+    val popularity: Double? = null,
     val runtime: Int? = null
 )

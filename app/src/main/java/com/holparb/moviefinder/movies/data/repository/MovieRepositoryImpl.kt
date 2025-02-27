@@ -97,9 +97,28 @@ class MovieRepositoryImpl @Inject constructor (
     }
 
     override suspend fun getMovieDetails(movieId: Int): Result<Movie, DataError> {
+        val movieDetailsEntity = movieDatabase.movieDao.getMovieById(movieId)!!
+        if(movieDetailsEntity.details) {
+            return Result.Success(movieDetailsEntity.toMovie())
+        }
+
         return when(val result = moviesDataSource.getMovieDetails(movieId)) {
             is Result.Error -> Result.Error(DataError.Network(result.error))
-            is Result.Success -> Result.Success(result.data.toMovie())
+            is Result.Success -> {
+                val updatedEntity = result.data.toMovieEntity(
+                    isPopular = movieDetailsEntity.isPopular,
+                    isUpcoming = movieDetailsEntity.isUpcoming,
+                    isTopRated = movieDetailsEntity.isTopRated,
+                    isWatchlist = movieDetailsEntity.isWatchlist
+                )
+                try {
+                    movieDatabase.movieDao.upsertMovie(updatedEntity)
+                } catch (e: Exception) {
+                    Log.e(this.javaClass.simpleName, e.toString())
+                }
+
+                Result.Success(updatedEntity.toMovie())
+            }
         }
     }
 
@@ -146,10 +165,10 @@ class MovieRepositoryImpl @Inject constructor (
         sessionId: String,
         page: Int
     ): Result<List<Movie>, DataError> {
-        when(val result = getWatchlistFromDatabase(page)) {
-            is Result.Error -> return Result.Error(DataError.Database(result.error.databaseError))
+        return when(val result = getWatchlistFromDatabase(page)) {
+            is Result.Error -> Result.Error(DataError.Database(result.error.databaseError))
             is Result.Success -> {
-                return if(result.data.isNotEmpty()) {
+                if(result.data.isNotEmpty()) {
                     Result.Success(result.data)
                 } else {
                     when(val remoteResult = getWatchlistFromRemoteDataSource(sessionId = sessionId, page = page)) {
