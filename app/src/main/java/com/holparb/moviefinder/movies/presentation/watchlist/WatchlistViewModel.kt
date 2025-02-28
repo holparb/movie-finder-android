@@ -30,12 +30,10 @@ class WatchlistViewModel @Inject constructor(
             _state.update { it.copy(isNewPageLoading = isLoading) }
         },
         onRequest = { page ->
-            val result = movieRepository.getWatchlist(
+            movieRepository.getWatchlist(
                 sessionId = localEncryptedStorage.getSessionId()!!,
                 page = page
             )
-            println(result.toString())
-            result
         },
         onError = { error ->
             _events.send(WatchlistEvent.WatchlistError(error))
@@ -46,9 +44,9 @@ class WatchlistViewModel @Inject constructor(
                     it.copy(isLastPageReached = true)
                 }
             } else {
-                _state.update {
-                    it.copy(
-                        movies = movies.map { movie ->
+                _state.update { state ->
+                    state.copy(
+                        movies = state.movies + movies.map { movie ->
                             movie.toMovieVerticalListItemUi()
                         }
                     )

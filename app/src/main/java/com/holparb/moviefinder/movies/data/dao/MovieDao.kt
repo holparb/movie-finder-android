@@ -32,6 +32,6 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE is_upcoming")
     fun getUpcomingMoviesWithPagination(): PagingSource<Int, MovieEntity>
 
-    @Query("SELECT * FROM movies WHERE is_watchlist LIMIT 20 OFFSET :offset")
+    @Query("SELECT * FROM movies WHERE is_watchlist ORDER BY id ASC LIMIT 20 OFFSET :offset")
     suspend fun getWatchlist(offset: Int = 0): List<MovieEntity>
 }

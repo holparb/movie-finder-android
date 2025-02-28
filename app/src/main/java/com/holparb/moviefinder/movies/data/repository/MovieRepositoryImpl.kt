@@ -124,7 +124,7 @@ class MovieRepositoryImpl @Inject constructor (
 
     private suspend fun getWatchlistFromDatabase(page: Int): Result<List<Movie>, DataError.Database> {
         return try {
-            val movies = movieDatabase.movieDao.getWatchlist(page - 1).map {
+            val movies = movieDatabase.movieDao.getWatchlist((page - 1) * 20).map {
                 it.toMovie()
             }
             Result.Success(movies)

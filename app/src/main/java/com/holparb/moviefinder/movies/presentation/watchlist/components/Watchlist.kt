@@ -1,14 +1,10 @@
 package com.holparb.moviefinder.movies.presentation.watchlist.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -26,24 +22,22 @@ fun Watchlist(
     onAction: (WatchlistAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scrollState = rememberLazyListState()
+    val listState = rememberLazyListState()
     val isScrolledToEnd by remember {
         derivedStateOf {
-            val layoutInfo = scrollState.layoutInfo
-            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-                ?: return@derivedStateOf true
-            lastVisibleItem.index == layoutInfo.totalItemsCount - 1
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem?.index != 0 && lastVisibleItem?.index == listState.layoutInfo.totalItemsCount - 1
         }
     }
     LaunchedEffect(isScrolledToEnd) {
-        if(isScrolledToEnd && !state.isLastPageReached) {
+        if(isScrolledToEnd && !state.isLastPageReached && !state.isNewPageLoading) {
             onAction(WatchlistAction.LoadWatchlist)
         }
     }
 
     LazyColumn(
         modifier.fillMaxSize(),
-        state = scrollState,
+        state = listState,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(state.movies.size) { index ->
@@ -51,18 +45,6 @@ fun Watchlist(
                 modifier = Modifier.height(200.dp),
                 movieVerticalListItemUi = state.movies[index]
             )
-        }
-        item {
-            if(state.isNewPageLoading) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
         }
     }
 }
