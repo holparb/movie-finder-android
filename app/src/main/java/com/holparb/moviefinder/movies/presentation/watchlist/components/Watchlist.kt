@@ -1,15 +1,21 @@
 package com.holparb.moviefinder.movies.presentation.watchlist.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.holparb.moviefinder.movies.presentation.see_more_screen.components.MovieVerticalListItem
@@ -25,8 +31,9 @@ fun Watchlist(
     val listState = rememberLazyListState()
     val isScrolledToEnd by remember {
         derivedStateOf {
-            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-            lastVisibleItem?.index != 0 && lastVisibleItem?.index == listState.layoutInfo.totalItemsCount - 1
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull() ?:
+                return@derivedStateOf false
+            listState.layoutInfo.totalItemsCount - lastVisibleItem.index <= 2
         }
     }
     LaunchedEffect(isScrolledToEnd) {
@@ -45,6 +52,18 @@ fun Watchlist(
                 modifier = Modifier.height(200.dp),
                 movieVerticalListItemUi = state.movies[index]
             )
+        }
+        if(state.isNewPageLoading) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(25.dp)
+                    )
+                }
+            }
         }
     }
 }
