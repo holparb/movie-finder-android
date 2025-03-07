@@ -11,7 +11,6 @@ import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
 import com.holparb.moviefinder.core.domain.util.map
 import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
-import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovie
 import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
@@ -128,6 +127,9 @@ class MovieRepositoryImpl @Inject constructor (
             val movies = movieDatabase.movieDao.getWatchlist((page - 1) * 20).map {
                 it.toMovie()
             }
+            movies.forEach {
+                println(it)
+            }
             Result.Success(movies)
         } catch (e: Exception) {
             Log.e(this.javaClass.simpleName, e.toString())
@@ -135,12 +137,7 @@ class MovieRepositoryImpl @Inject constructor (
         }
     }
 
-    private suspend fun writeWatchlistMovieDtosToDatabase(movieListItemDtos: List<MovieListItemDto>) {
-        val movieEntities: MutableList<MovieEntity> = mutableListOf()
-        movieListItemDtos.forEach { movieListItemDto ->
-            val movieEntity = movieDatabase.movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
-            movieEntities.add(movieEntity.copy(isWatchlist = true))
-        }
+    private suspend fun writeEntitiesToWatchlist(movieEntities: List<MovieEntity>) {
         movieDatabase.withTransaction {
             try {
                 movieDatabase.movieDao.upsertMovies(movieEntities)
@@ -150,24 +147,39 @@ class MovieRepositoryImpl @Inject constructor (
         }
     }
 
+    private suspend fun fetchWatchlistFromRemote(
+        sessionId: String,
+        page: Int
+    ): Result<List<MovieEntity>, DataError.Network> {
+        return when(val remoteResult = moviesDataSource.getWatchlist(sessionId = sessionId, page = page)) {
+            is Result.Error -> Result.Error(DataError.Network(remoteResult.error))
+            is Result.Success -> {
+                val movieEntities = remoteResult.data.map { movieListItemDto ->
+                    val movieEntity = movieDatabase.movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
+                    movieEntity.copy(isWatchlist = true)
+                }
+                Result.Success(movieEntities)
+            }
+        }
+    }
+
     override suspend fun getWatchlist(
         sessionId: String,
         page: Int
     ): Result<List<Movie>, DataError> {
-        when(val result = getWatchlistFromDatabase(page)) {
-            is Result.Error -> return Result.Error(DataError.Database(result.error.databaseError))
+        return when(val result = getWatchlistFromDatabase(page)) {
+            is Result.Error -> Result.Error(DataError.Database(result.error.databaseError))
             is Result.Success -> {
                 if(result.data.isNotEmpty()) {
-                    return Result.Success(result.data)
-                } else {
-                    when(val remoteResult = moviesDataSource.getWatchlist(sessionId = sessionId, page = page)) {
-                        is Result.Error -> return Result.Error(DataError.Network(remoteResult.error))
-                        is Result.Success -> {
-                            writeWatchlistMovieDtosToDatabase(remoteResult.data)
-                            return getWatchlistFromDatabase(page)
-                        }
+                    Result.Success(result.data)
+                }
+                when (val remoteResult = fetchWatchlistFromRemote(sessionId = sessionId, page = page)) {
+                    is Result.Error -> return Result.Error(remoteResult.error)
+                    is Result.Success -> {
+                        writeEntitiesToWatchlist(remoteResult.data)
                     }
                 }
+                getWatchlistFromDatabase(page)
             }
         }
     }

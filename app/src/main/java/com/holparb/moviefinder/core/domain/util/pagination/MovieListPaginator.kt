@@ -24,13 +24,13 @@ class MovieListPaginator @AssistedInject constructor (
         isMakingRequest = false
         when(result) {
             is Result.Error -> {
-                onError(result.error)
                 onLoadUpdated(false)
+                onError(result.error)
             }
             is Result.Success -> {
                 currentPage ++
-                onSuccess(result.data)
                 onLoadUpdated(false)
+                onSuccess(result.data)
             }
         }
     }
