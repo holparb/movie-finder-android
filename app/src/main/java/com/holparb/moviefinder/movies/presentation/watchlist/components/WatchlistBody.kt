@@ -1,12 +1,9 @@
 package com.holparb.moviefinder.movies.presentation.watchlist.components
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.holparb.moviefinder.core.domain.util.errors.DataError
 import com.holparb.moviefinder.core.presentation.util.ObserveAsEvents
 import com.holparb.moviefinder.core.presentation.util.toString
@@ -39,16 +36,12 @@ fun WatchlistBody(
             }
         }
     }
-    Box(
-        modifier = modifier.padding(bottom = 16.dp)
-    ) {
-        if(state.isUserLoggedIn.not()) {
-            WatchlistNotLoggedIn(navigateToLogin = navigateToLogin)
-        } else {
-            Watchlist(
-                state = state,
-                onAction = onAction
-            )
-        }
+    if(state.isUserLoggedIn.not()) {
+        WatchlistNotLoggedIn(navigateToLogin = navigateToLogin)
+    } else {
+        Watchlist(
+            state = state,
+            onAction = onAction
+        )
     }
 }

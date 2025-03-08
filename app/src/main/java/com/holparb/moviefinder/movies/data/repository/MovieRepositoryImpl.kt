@@ -156,7 +156,7 @@ class MovieRepositoryImpl @Inject constructor (
             is Result.Success -> {
                 val movieEntities = remoteResult.data.map { movieListItemDto ->
                     val movieEntity = movieDatabase.movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
-                    movieEntity.copy(isWatchlist = true)
+                    movieEntity.copy(isWatchlist = true, watchlistPage = page)
                 }
                 Result.Success(movieEntities)
             }
@@ -175,9 +175,7 @@ class MovieRepositoryImpl @Inject constructor (
                 }
                 when (val remoteResult = fetchWatchlistFromRemote(sessionId = sessionId, page = page)) {
                     is Result.Error -> return Result.Error(remoteResult.error)
-                    is Result.Success -> {
-                        writeEntitiesToWatchlist(remoteResult.data)
-                    }
+                    is Result.Success -> writeEntitiesToWatchlist(remoteResult.data)
                 }
                 getWatchlistFromDatabase(page)
             }
