@@ -16,6 +16,7 @@ data class MovieDetailsDto(
     val releaseDate: String? = null,
     @SerialName("vote_average")
     val rating: Double? = null,
+    val popularity: Double? = null,
     val runtime: Int? = null,
     val genres: List<GenreDto> = emptyList<GenreDto>()
 )

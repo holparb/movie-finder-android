@@ -3,8 +3,8 @@ package com.holparb.moviefinder.movies.presentation.watchlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.holparb.moviefinder.core.domain.util.LocalEncryptedStorage
-import com.holparb.moviefinder.core.domain.util.onError
-import com.holparb.moviefinder.core.domain.util.onSuccess
+import com.holparb.moviefinder.core.domain.util.pagination.MovieListPaginator
+import com.holparb.moviefinder.di.MovieListPaginatorFactory
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import com.holparb.moviefinder.movies.presentation.see_more_screen.components.toMovieVerticalListItemUi
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,12 +21,44 @@ import javax.inject.Inject
 @HiltViewModel
 class WatchlistViewModel @Inject constructor(
     private val localEncryptedStorage: LocalEncryptedStorage,
-    private val movieRepository: MovieRepository
+    private val movieRepository: MovieRepository,
+    private val movieListPaginatorFactory: MovieListPaginatorFactory
 ): ViewModel() {
+
+    private val movieListPaginator: MovieListPaginator = movieListPaginatorFactory.create(
+        onLoadUpdated = { isLoading ->
+            _state.update { it.copy(isNewPageLoading = isLoading) }
+        },
+        onRequest = { page ->
+            movieRepository.getWatchlist(
+                sessionId = localEncryptedStorage.getSessionId()!!,
+                page = page
+            )
+        },
+        onError = { error ->
+            _events.send(WatchlistEvent.WatchlistError(error))
+        },
+        onSuccess = { movies ->
+            if(movies.isEmpty()) {
+                _state.update {
+                    it.copy(isLastPageReached = true)
+                }
+            } else {
+                _state.update { state ->
+                    state.copy(
+                        movies = state.movies + movies.map { movie ->
+                            movie.toMovieVerticalListItemUi()
+                        }
+                    )
+                }
+            }
+        }
+    )
 
     private val _state = MutableStateFlow(WatchlistState())
     val state = _state
         .onStart {
+            localEncryptedStorage.saveSessionId("dad4b9be4a1aa1d53f8cf205fe084045bf2fa30e")
             val isUserLoggedIn = localEncryptedStorage.getSessionId() != null
             _state.update {
                 it.copy(
@@ -45,24 +77,15 @@ class WatchlistViewModel @Inject constructor(
     private val _events = Channel<WatchlistEvent>()
     val events = _events.receiveAsFlow()
 
+    fun onAction(action: WatchlistAction) {
+        when(action) {
+           is WatchlistAction.LoadWatchlist -> { loadWatchlist() }
+        }
+    }
+
     private fun loadWatchlist() {
-        _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            movieRepository.getWatchlist(localEncryptedStorage.getSessionId()!!)
-                .onSuccess { movies ->
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            movies = movies.map { movie ->
-                                movie.toMovieVerticalListItemUi()
-                            }
-                        )
-                    }
-                }
-                .onError { dataError ->
-                    _state.update { it.copy(isLoading = false) }
-                    _events.send(WatchlistEvent.WatchlistError(dataError))
-                }
+            movieListPaginator.loadNextPage()
         }
     }
 }

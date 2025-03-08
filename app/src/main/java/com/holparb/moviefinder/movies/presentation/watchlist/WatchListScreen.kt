@@ -46,6 +46,7 @@ fun WatchListScreen(
         )
         WatchlistBody(
             state = state,
+            onAction = watchlistViewModel::onAction,
             events = watchlistViewModel.events,
             navigateToLogin = navigateToLogin,
         )

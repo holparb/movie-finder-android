@@ -85,8 +85,8 @@ dependencies {
     implementation(libs.navigation.compose)
 
     // Dagger - Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    implementation(libs.dagger.hilt.android)
+    ksp(libs.dagger.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Image caching with Coil

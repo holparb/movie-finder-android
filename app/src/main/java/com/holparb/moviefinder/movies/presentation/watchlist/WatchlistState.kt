@@ -4,6 +4,7 @@ import com.holparb.moviefinder.movies.presentation.see_more_screen.components.Mo
 
 data class WatchlistState(
     val movies: List<MovieVerticalListItemUi> = emptyList(),
-    val isLoading: Boolean = false,
-    val isUserLoggedIn: Boolean = false
+    val isNewPageLoading: Boolean = false,
+    val isUserLoggedIn: Boolean = false,
+    val isLastPageReached: Boolean = false
 )
