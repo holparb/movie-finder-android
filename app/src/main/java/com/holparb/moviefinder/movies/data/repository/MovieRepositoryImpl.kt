@@ -4,12 +4,11 @@ import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
-import androidx.room.withTransaction
 import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.errors.DataError
 import com.holparb.moviefinder.core.domain.util.errors.DatabaseError
 import com.holparb.moviefinder.core.domain.util.map
-import com.holparb.moviefinder.movies.data.datasource.local.MovieDatabase
+import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
 import com.holparb.moviefinder.movies.data.mappers.toMovie
@@ -24,7 +23,7 @@ import javax.inject.Named
 
 class MovieRepositoryImpl @Inject constructor (
     private val moviesDataSource: RemoteMoviesDataSource,
-    private val movieDatabase: MovieDatabase,
+    private val movieDao: MovieDao,
     @Named("PopularMoviesPager") private val popularMoviesPager: Pager<Int, MovieEntity>,
     @Named("TopRatedMoviesPager") private val topRatedMoviesPager: Pager<Int, MovieEntity>,
     @Named("UpcomingMoviesPager") private val upcomingMoviesPager: Pager<Int, MovieEntity>
@@ -42,7 +41,7 @@ class MovieRepositoryImpl @Inject constructor (
         movieListType: MovieListType,
         page: Int,
         region: String
-    ): Result<List<Movie>, DataError> {
+    ): Result<List<Movie>, DataError.Network> {
         val movieEntities: MutableList<MovieEntity> = mutableListOf()
         val result = moviesDataSource.getMoviesList(
             movieListType = movieListType,
@@ -50,7 +49,7 @@ class MovieRepositoryImpl @Inject constructor (
             region = region
         ).map {
             it.map { movieListItemDto ->
-                val movieEntity = movieDatabase.movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
+                val movieEntity = movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
                 val movieEntityToAdd = when(movieListType) {
                     MovieListType.PopularMovies -> movieEntity.copy(isPopular = true)
                     MovieListType.TopRatedMovies -> movieEntity.copy(isTopRated = true)
@@ -60,12 +59,10 @@ class MovieRepositoryImpl @Inject constructor (
                 movieListItemDto.toMovie()
             }
         }
-        movieDatabase.withTransaction {
-            try {
-                movieDatabase.movieDao.upsertMovies(movieEntities)
-            } catch(e: Exception) {
-                Log.e(this.javaClass.simpleName, e.toString())
-            }
+        try {
+            movieDao.upsertMovies(movieEntities)
+        } catch(e: Exception) {
+            Log.e(this.javaClass.simpleName, e.toString())
         }
         return when(result) {
             is Result.Error -> Result.Error(DataError.Network(result.error))
@@ -76,7 +73,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getPopularMovies(
         page: Int,
         region: String
-    ): Result<List<Movie>, DataError> {
+    ): Result<List<Movie>, DataError.Network> {
         return getMoviesFromRemoteDataSource(
             movieListType = MovieListType.PopularMovies,
             page = page,
@@ -97,7 +94,7 @@ class MovieRepositoryImpl @Inject constructor (
     }
 
     override suspend fun getMovieDetails(movieId: Int): Result<Movie, DataError> {
-        val movieDetailsEntity = movieDatabase.movieDao.getMovieById(movieId)!!
+        val movieDetailsEntity = movieDao.getMovieById(movieId)!!
         if(movieDetailsEntity.details) {
             return Result.Success(movieDetailsEntity.toMovie())
         }
@@ -112,7 +109,7 @@ class MovieRepositoryImpl @Inject constructor (
                     isWatchlist = movieDetailsEntity.isWatchlist
                 )
                 try {
-                    movieDatabase.movieDao.upsertMovie(updatedEntity)
+                    movieDao.upsertMovie(updatedEntity)
                 } catch (e: Exception) {
                     Log.e(this.javaClass.simpleName, e.toString())
                 }
@@ -124,7 +121,7 @@ class MovieRepositoryImpl @Inject constructor (
 
     private suspend fun getWatchlistFromDatabase(page: Int): Result<List<Movie>, DataError.Database> {
         return try {
-            val movies = movieDatabase.movieDao.getWatchlist((page - 1) * 20).map {
+            val movies = movieDao.getWatchlist((page - 1) * 20).map {
                 it.toMovie()
             }
             movies.forEach {
@@ -138,12 +135,10 @@ class MovieRepositoryImpl @Inject constructor (
     }
 
     private suspend fun writeEntitiesToWatchlist(movieEntities: List<MovieEntity>) {
-        movieDatabase.withTransaction {
-            try {
-                movieDatabase.movieDao.upsertMovies(movieEntities)
-            } catch(e: Exception) {
-                Log.e(this.javaClass.simpleName, e.toString())
-            }
+        try {
+            movieDao.upsertMovies(movieEntities)
+        } catch(e: Exception) {
+            Log.e(this.javaClass.simpleName, e.toString())
         }
     }
 
@@ -155,7 +150,7 @@ class MovieRepositoryImpl @Inject constructor (
             is Result.Error -> Result.Error(DataError.Network(remoteResult.error))
             is Result.Success -> {
                 val movieEntities = remoteResult.data.map { movieListItemDto ->
-                    val movieEntity = movieDatabase.movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
+                    val movieEntity = movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
                     movieEntity.copy(isWatchlist = true, watchlistPage = page)
                 }
                 Result.Success(movieEntities)
@@ -185,7 +180,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getTopRatedMovies(
         page: Int,
         region: String
-    ): Result<List<Movie>, DataError> {
+    ): Result<List<Movie>, DataError.Network> {
         return getMoviesFromRemoteDataSource(
             movieListType = MovieListType.TopRatedMovies,
             page = page,
@@ -196,7 +191,7 @@ class MovieRepositoryImpl @Inject constructor (
     override suspend fun getUpcomingMovies(
         page: Int,
         region: String
-    ): Result<List<Movie>, DataError> {
+    ): Result<List<Movie>, DataError.Network> {
         return getMoviesFromRemoteDataSource(
             movieListType = MovieListType.UpcomingMovies,
             page = page,
