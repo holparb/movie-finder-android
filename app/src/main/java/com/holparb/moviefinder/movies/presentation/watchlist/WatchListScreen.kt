@@ -21,6 +21,7 @@ import com.holparb.moviefinder.movies.presentation.watchlist.components.Watchlis
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WatchListScreen(
+    navigateToDetails: (Int) -> Unit,
     navigateToLogin: () -> Unit
 ) {
     val watchlistViewModel = hiltViewModel<WatchlistViewModel>()
@@ -49,6 +50,7 @@ fun WatchListScreen(
             onAction = watchlistViewModel::onAction,
             events = watchlistViewModel.events,
             navigateToLogin = navigateToLogin,
+            navigateToDetails = navigateToDetails
         )
     }
 }

@@ -18,6 +18,7 @@ fun WatchlistBody(
     onAction: (WatchlistAction) -> Unit,
     events: Flow<WatchlistEvent>,
     navigateToLogin: () -> Unit,
+    navigateToDetails: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -41,6 +42,7 @@ fun WatchlistBody(
     } else {
         Watchlist(
             state = state,
+            navigateToDetails = navigateToDetails,
             onAction = onAction
         )
     }

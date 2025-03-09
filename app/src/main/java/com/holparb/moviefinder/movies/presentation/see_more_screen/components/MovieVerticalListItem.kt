@@ -1,5 +1,6 @@
 package com.holparb.moviefinder.movies.presentation.see_more_screen.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,11 +29,13 @@ import java.time.LocalDate
 @Composable
 fun MovieVerticalListItem(
     movieVerticalListItemUi: MovieVerticalListItemUi,
+    navigateToDetails: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(onClick = {navigateToDetails(movieVerticalListItemUi.id)})
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -80,5 +83,5 @@ fun MovieVerticalListItem(
 @Composable
 private fun MovieVerticalListItemPreview() {
     val movie = Movie(id = 1, title = "Title", releaseDate = LocalDate.now(), posterPath = "", overview = "This is some Review of the movie here", backdropPath = "")
-    MovieVerticalListItem(movieVerticalListItemUi = movie.toMovieVerticalListItemUi(), modifier = Modifier.height(250.dp))
+    MovieVerticalListItem(movieVerticalListItemUi = movie.toMovieVerticalListItemUi(), navigateToDetails = {}, modifier = Modifier.height(250.dp))
 }

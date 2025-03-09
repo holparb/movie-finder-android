@@ -44,6 +44,11 @@ fun Navigation(navController: NavHostController) {
                         navController.navigate(Destination.LoginScreenDestination) {
                             popUpTo(Destination.WatchlistDestination) { inclusive = true }
                         }
+                    },
+                    navigateToDetails = { movieId ->
+                        navController.navigate(
+                            Destination.MovieDetailsDestination(movieId = movieId)
+                        )
                     }
                 )
             }
@@ -56,6 +61,11 @@ fun Navigation(navController: NavHostController) {
             SeeMoreScreen(
                 title = args.title,
                 listType = args.listType,
+                navigateToDetails = { movieId ->
+                    navController.navigate(
+                        Destination.MovieDetailsDestination(movieId = movieId)
+                    )
+                },
                 onBack = { navController.popBackStack() }
             )
         }

@@ -30,6 +30,7 @@ import com.holparb.moviefinder.movies.presentation.see_more_screen.components.Mo
 fun SeeMoreScreen(
     title: String,
     listType: MovieListType,
+    navigateToDetails: (Int) -> Unit,
     onBack: () -> Unit
 ) {
     val movieListViewModel = hiltViewModel<MovieListViewModel>()
@@ -68,7 +69,7 @@ fun SeeMoreScreen(
                 .fillMaxWidth()
                 .padding(paddingValues)
         ) {
-            MovieVerticalList(movies = movies)
+            MovieVerticalList(movies = movies, navigateToDetails  = navigateToDetails)
         }
     }
 }
@@ -76,5 +77,5 @@ fun SeeMoreScreen(
 @Preview
 @Composable
 private fun SeeMoreScreenPreview() {
-    SeeMoreScreen(title = "Movies", listType = MovieListType.PopularMovies, onBack = {})
+    SeeMoreScreen(title = "Movies", listType = MovieListType.PopularMovies, navigateToDetails = {}, onBack = {})
 }

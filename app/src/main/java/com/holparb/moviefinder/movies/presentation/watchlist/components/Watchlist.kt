@@ -26,6 +26,7 @@ import com.holparb.moviefinder.movies.presentation.watchlist.WatchlistState
 fun Watchlist(
     state: WatchlistState,
     onAction: (WatchlistAction) -> Unit,
+    navigateToDetails: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -50,6 +51,7 @@ fun Watchlist(
         items(state.movies.size) { index ->
             MovieVerticalListItem(
                 modifier = Modifier.height(200.dp),
+                navigateToDetails = navigateToDetails,
                 movieVerticalListItemUi = state.movies[index]
             )
         }
