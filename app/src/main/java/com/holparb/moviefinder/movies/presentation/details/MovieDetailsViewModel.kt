@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.holparb.moviefinder.core.domain.util.Result
 import com.holparb.moviefinder.core.domain.util.errors.DataError
 import com.holparb.moviefinder.core.domain.util.onError
 import com.holparb.moviefinder.core.domain.util.onSuccess
@@ -37,7 +38,7 @@ class MovieDetailsViewModel @Inject constructor(
             MovieDetailsState()
         )
 
-    val _events = Channel<MovieEvent>()
+    private val _events = Channel<MovieEvent>()
     val events = _events.receiveAsFlow()
 
     private fun loadMovieDetails() {
@@ -62,6 +63,19 @@ class MovieDetailsViewModel @Inject constructor(
                     }
                 }
         }
+    }
 
+    fun toggleWatchlist() {
+        val movieDetailsUi = state.value.movieDetailsUi
+        viewModelScope.launch {
+            when(val result = repository.updateWatchlistState(movieDetailsUi.id, movieDetailsUi.isWatchlist.not())) {
+                is Result.Error -> _events.send(MovieEvent.LocalError(result.error.databaseError))
+                is Result.Success -> {
+                    savedStateHandle["state"] = savedStateHandle.get<MovieDetailsState>("state")?.copy(
+                        movieDetailsUi = movieDetailsUi.copy(isWatchlist = movieDetailsUi.isWatchlist.not())
+                    )
+                }
+            }
+        }
     }
 }

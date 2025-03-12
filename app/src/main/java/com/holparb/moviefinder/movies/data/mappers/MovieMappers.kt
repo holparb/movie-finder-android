@@ -59,6 +59,7 @@ fun MovieEntity.toMovie(): Movie {
         runtime = runtime,
         rating = rating,
         popularity = popularity,
+        isWatchlist = isWatchlist
     )
 }
 

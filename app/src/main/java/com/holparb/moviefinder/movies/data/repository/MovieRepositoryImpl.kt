@@ -49,7 +49,7 @@ class MovieRepositoryImpl @Inject constructor (
             region = region
         ).map {
             it.map { movieListItemDto ->
-                val movieEntity = movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
+                val movieEntity = movieDao.getMovieById(movieListItemDto.id)
                 val movieEntityToAdd = when(movieListType) {
                     MovieListType.PopularMovies -> movieEntity.copy(isPopular = true)
                     MovieListType.TopRatedMovies -> movieEntity.copy(isTopRated = true)
@@ -94,7 +94,7 @@ class MovieRepositoryImpl @Inject constructor (
     }
 
     override suspend fun getMovieDetails(movieId: Int): Result<Movie, DataError> {
-        val movieDetailsEntity = movieDao.getMovieById(movieId)!!
+        val movieDetailsEntity = movieDao.getMovieById(movieId)
         if(movieDetailsEntity.details) {
             return Result.Success(movieDetailsEntity.toMovie())
         }
@@ -150,7 +150,7 @@ class MovieRepositoryImpl @Inject constructor (
             is Result.Error -> Result.Error(DataError.Network(remoteResult.error))
             is Result.Success -> {
                 val movieEntities = remoteResult.data.map { movieListItemDto ->
-                    val movieEntity = movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
+                    val movieEntity = movieDao.getMovieById(movieListItemDto.id)
                     movieEntity.copy(isWatchlist = true, watchlistPage = page)
                 }
                 Result.Success(movieEntities)
@@ -174,6 +174,16 @@ class MovieRepositoryImpl @Inject constructor (
                 }
                 getWatchlistFromDatabase(page)
             }
+        }
+    }
+
+    override suspend fun updateWatchlistState(movieId: Int, isWatchlist: Boolean): Result<Unit, DataError.Database> {
+        val movieEntity = movieDao.getMovieById(movieId)
+        return try {
+            movieDao.upsertMovie(movieEntity.copy(isWatchlist = isWatchlist))
+            Result.Success(Unit)
+        } catch(e: Exception) {
+            Result.Error(DataError.Database(DatabaseError.UPSERT_ERROR))
         }
     }
 

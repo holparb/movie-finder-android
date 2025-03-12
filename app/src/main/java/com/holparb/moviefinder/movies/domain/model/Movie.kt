@@ -12,5 +12,6 @@ data class Movie(
     val genres: List<Genre> = emptyList(),
     val rating: Double? = null,
     val popularity: Double? = null,
-    val runtime: Int? = null
+    val runtime: Int? = null,
+    val isWatchlist: Boolean = false
 )

@@ -70,7 +70,7 @@ fun Navigation(navController: NavHostController) {
             )
         }
         composable<Destination.MovieDetailsDestination> {
-            MovieDetailsScreen()
+            MovieDetailsScreen(onBack = { navController.popBackStack() })
         }
         composable<Destination.LoginScreenDestination> {
             LoginScreen(

@@ -19,6 +19,8 @@ import com.holparb.moviefinder.ui.theme.MovieFinderTheme
 @Composable
 fun MovieDetailsDisplay(
     movieDetailsUi: MovieDetailsUi,
+    toggleWatchlist: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -27,6 +29,8 @@ fun MovieDetailsDisplay(
     ) {
         MovieDetailsHeader(
             movieDetailsUi = movieDetailsUi,
+            toggleWatchlist = toggleWatchlist,
+            onBack = onBack,
             modifier = Modifier.height(300.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -49,6 +53,6 @@ fun MovieDetailsDisplay(
 @Composable
 private fun MovieDetailsDisplayPreview() {
     MovieFinderTheme {
-        MovieDetailsDisplay(movieDetailsUi = previewMovie.toMovieDetailsUi())
+        MovieDetailsDisplay(movieDetailsUi = previewMovie.toMovieDetailsUi(), toggleWatchlist = {}, onBack = {})
     }
 }
