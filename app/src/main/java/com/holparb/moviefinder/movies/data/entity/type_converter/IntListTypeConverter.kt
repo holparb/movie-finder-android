@@ -12,6 +12,10 @@ class IntListTypeConverter {
 
     @TypeConverter
     fun fromStringToIntList(string: String): List<Int> {
-        return string.removeSurrounding("[", "]").split(",").map { it.toInt() }
+        return try {
+            string.removeSurrounding("[", "]").split(",").map { it.toInt() }
+        } catch (e: NumberFormatException) {
+            emptyList()
+        }
     }
 }

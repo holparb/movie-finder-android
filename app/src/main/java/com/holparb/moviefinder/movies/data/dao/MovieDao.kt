@@ -18,7 +18,7 @@ interface MovieDao {
     suspend fun clearAll()
 
     @Query("SELECT * FROM movies WHERE id = :id")
-    suspend fun getMovieById(id: Int): MovieEntity
+    suspend fun getMovieById(id: Int): MovieEntity?
 
     @Query("SELECT * FROM movies WHERE is_popular ORDER BY release_date DESC LIMIT 20")
     suspend fun getPopularMoviesForHomeScreen(): List<MovieEntity>
