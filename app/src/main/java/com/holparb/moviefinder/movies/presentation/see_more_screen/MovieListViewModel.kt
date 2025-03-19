@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movies.presentation.see_more
+package com.holparb.moviefinder.movies.presentation.see_more_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

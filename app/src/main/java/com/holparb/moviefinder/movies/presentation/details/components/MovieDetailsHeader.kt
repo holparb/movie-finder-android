@@ -10,20 +10,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +46,8 @@ import java.time.LocalDate
 @Composable
 fun MovieDetailsHeader(
     movieDetailsUi: MovieDetailsUi,
+    toggleWatchlist: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -63,6 +72,42 @@ fun MovieDetailsHeader(
                 .fillMaxSize(),
 
         )
+        Box(
+            modifier = Modifier.align(Alignment.TopStart).padding(start = 16.dp, top = 16.dp)
+        ) {
+            IconButton(
+                onClick = { onBack() },
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(Color.Gray.copy(alpha = 0.5f))
+                    .size(50.dp)
+            ) {
+                Icon(
+                    modifier = Modifier.size(46.dp),
+                    imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+        }
+        Box(
+            modifier = Modifier.align(Alignment.TopEnd).padding(end = 16.dp, top = 16.dp)
+        ) {
+            IconButton(
+                onClick = { toggleWatchlist() },
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(Color.Gray.copy(alpha = 0.5f))
+                    .size(50.dp)
+            ) {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = if (movieDetailsUi.isWatchlist) MaterialTheme.colorScheme.primary else Color.White
+                )
+            }
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -104,7 +149,7 @@ fun MovieDetailsHeader(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = movieDetailsUi.rating,
+                    text = movieDetailsUi.rating?.formattedValue ?: stringResource(R.string.no_rating),
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                 )
             }
@@ -116,7 +161,7 @@ fun MovieDetailsHeader(
 @Composable
 fun MovieDetailsHeaderPreview() {
     MovieFinderTheme {
-        MovieDetailsHeader(movieDetailsUi = previewMovie.toMovieDetailsUi(), modifier = Modifier.height(400.dp))
+        MovieDetailsHeader(movieDetailsUi = previewMovie.toMovieDetailsUi(), onBack = {}, toggleWatchlist = {}, modifier = Modifier.height(400.dp))
     }
 }
 

@@ -55,8 +55,4 @@ class AuthRepositoryImpl @Inject constructor(
         localEncryptedStorage.saveSessionId(sessionId!!)
         return Result.Success(sessionId!!)
     }
-
-    override fun isUserLoggedIn(): Boolean {
-        return localEncryptedStorage.getSessionId() != null
-    }
 }

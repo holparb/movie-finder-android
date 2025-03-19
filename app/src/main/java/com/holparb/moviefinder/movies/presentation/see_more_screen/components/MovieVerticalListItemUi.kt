@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movies.presentation.see_more.components
+package com.holparb.moviefinder.movies.presentation.see_more_screen.components
 
 import com.holparb.moviefinder.movies.domain.model.Movie
 import java.time.format.DateTimeFormatter

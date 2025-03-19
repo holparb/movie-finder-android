@@ -10,13 +10,17 @@ import com.holparb.moviefinder.movies.data.dao.MovieDao
 import com.holparb.moviefinder.movies.data.datasource.remote.RemoteMoviesDataSource
 import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
 import com.holparb.moviefinder.movies.data.entity.MovieEntity
+import com.holparb.moviefinder.movies.data.mappers.toMovie
+import com.holparb.moviefinder.movies.data.mappers.toMovieEntity
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
@@ -32,9 +36,11 @@ class MovieRepositoryTest {
     private lateinit var repository: MovieRepository
     private lateinit var mockPager: Pager<Int, MovieEntity>
 
-    private val movieList = (1 .. 20).map { index ->
+    private val movieListDtos = (1 .. 20).map { index ->
         MovieListItemDto(id = index, title = "title", overview = "Some text here")
     }
+
+    private val movieListEntities = movieListDtos.map { it.toMovieEntity() }
 
     @Before
     fun setup() {
@@ -59,13 +65,14 @@ class MovieRepositoryTest {
 
     @Test
     fun getPopularMovies_returns_movies_successfully(): Unit = runBlocking {
-        coEvery { dataSource.getMoviesList(movieListType = MovieListType.PopularMovies) } returns Result.Success(movieList)
-        coEvery { movieDao.upsertMovie(any<MovieEntity>()) } returns Unit
+        coEvery { dataSource.getMoviesList(movieListType = MovieListType.PopularMovies) } returns Result.Success(movieListDtos)
+        coEvery { movieDao.getMovieById(any<Int>()) } returns movieListEntities.first()
+        coEvery { movieDao.upsertMovies(any<List<MovieEntity>>()) } returns Unit
 
         val result = repository.getPopularMovies()
 
         Assert.assertTrue(result is Result.Success)
-        Assert.assertEquals(20, (result as Result.Success).data.size)
+        Assert.assertEquals(movieListDtos.map { it.toMovie() }, (result as Result.Success).data)
     }
 
     @Test
@@ -82,13 +89,70 @@ class MovieRepositoryTest {
 
     @Test
     fun getPopularMovies_returns_fails_because_of_database_exception(): Unit = runBlocking {
-        coEvery { dataSource.getMoviesList(movieListType = MovieListType.PopularMovies) } returns Result.Success(movieList)
-        coEvery { movieDao.upsertMovie(any<MovieEntity>()) } throws Exception()
+        coEvery { dataSource.getMoviesList(movieListType = MovieListType.PopularMovies) } returns Result.Success(movieListDtos)
+        coEvery { movieDao.getMovieById(any<Int>()) } returns movieListEntities.first()
+        coEvery { movieDao.upsertMovies(any<List<MovieEntity>>()) } throws Exception()
 
-        val result = repository.getPopularMovies()
+        repository.getPopularMovies()
+
+        verify { Log.e(any<String>(), any<String>()) }
+    }
+
+    @Test
+    fun getWatchlist_returns_data_from_database(): Unit = runBlocking {
+        coEvery { movieDao.getMovieById(any<Int>()) } returns movieListEntities.first()
+        coEvery { dataSource.getWatchlist(any<String>()) } returns Result.Success(movieListDtos)
+        coEvery { movieDao.upsertMovies(any<List<MovieEntity>>()) } returns Unit
+        coEvery { movieDao.getWatchlist(any<Int>()) } returns movieListEntities
+
+        val result = repository.getWatchlist("session_id")
+
+        Assert.assertTrue(result is Result.Success)
+        Assert.assertEquals(movieListEntities.map { it.toMovie() }, (result as Result.Success).data)
+    }
+
+    @Test
+    fun getWatchlist_returns_database_error(): Unit = runBlocking {
+        coEvery { movieDao.getMovieById(any<Int>()) } returns movieListEntities.first()
+        coEvery { dataSource.getWatchlist(any<String>()) } returns Result.Success(movieListDtos)
+        coEvery { movieDao.upsertMovies(any<List<MovieEntity>>()) } returns Unit
+        coEvery { movieDao.getWatchlist(any<Int>()) } throws Exception()
+
+        val result = repository.getWatchlist("session_id")
 
         Assert.assertTrue(result is Result.Error)
-        Assert.assertTrue((result as Result.Error).error == DataError.Database(DatabaseError.UPSERT_ERROR))
+        Assert.assertTrue((result as Result.Error).error == DataError.Database(DatabaseError.FETCH_ERROR))
+    }
 
+    @Test
+    fun getWatclist_triggers_remote_fetch_then_returns_data_from_database(): Unit = runBlocking {
+        val sessionId = "session_id"
+        coEvery { movieDao.getMovieById(any<Int>()) } returns movieListEntities.first()
+        coEvery { dataSource.getWatchlist(any<String>()) } returns Result.Success(movieListDtos)
+        coEvery { movieDao.upsertMovies(any<List<MovieEntity>>()) } returns Unit
+        coEvery { movieDao.getWatchlist(any<Int>()) } returnsMany listOf(emptyList(), movieListEntities)
+
+        val result = repository.getWatchlist(sessionId)
+        coVerify(exactly = 1) { dataSource.getWatchlist(sessionId, any<Int>()) }
+        coVerify(exactly = 2) { movieDao.getWatchlist(any<Int>()) }
+
+        Assert.assertTrue(result is Result.Success)
+        Assert.assertEquals(movieListEntities.map { it.toMovie() }, (result as Result.Success).data)
+    }
+
+    @Test
+    fun getWatclist_triggers_remote_fetch_but_returns_network_error(): Unit = runBlocking {
+        val networkError = NetworkError.SERVER_ERROR
+        val sessionId = "session_id"
+        coEvery { movieDao.getMovieById(any<Int>()) } returns movieListEntities.first()
+        coEvery { dataSource.getWatchlist(any<String>()) } returns Result.Error(networkError)
+        coEvery { movieDao.upsertMovies(any<List<MovieEntity>>()) } returns Unit
+        coEvery { movieDao.getWatchlist(any<Int>()) } returnsMany listOf(emptyList(), movieListEntities)
+
+        val result = repository.getWatchlist(sessionId)
+        coVerify(exactly = 1) { dataSource.getWatchlist(sessionId, any<Int>()) }
+
+        Assert.assertTrue(result is Result.Error)
+        Assert.assertTrue((result as Result.Error).error == DataError.Network(networkError))
     }
 }

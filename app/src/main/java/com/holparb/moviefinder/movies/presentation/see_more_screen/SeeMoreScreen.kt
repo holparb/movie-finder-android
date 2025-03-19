@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movies.presentation.see_more
+package com.holparb.moviefinder.movies.presentation.see_more_screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,13 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.holparb.moviefinder.movies.domain.model.MovieListType
-import com.holparb.moviefinder.movies.presentation.see_more.components.MovieVerticalList
+import com.holparb.moviefinder.movies.presentation.see_more_screen.components.MovieVerticalList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeeMoreScreen(
     title: String,
     listType: MovieListType,
+    navigateToDetails: (Int) -> Unit,
     onBack: () -> Unit
 ) {
     val movieListViewModel = hiltViewModel<MovieListViewModel>()
@@ -55,7 +56,7 @@ fun SeeMoreScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description"
+                            contentDescription = "Navigate back"
                         )
                     }
                 },
@@ -68,7 +69,7 @@ fun SeeMoreScreen(
                 .fillMaxWidth()
                 .padding(paddingValues)
         ) {
-            MovieVerticalList(movies = movies)
+            MovieVerticalList(movies = movies, navigateToDetails  = navigateToDetails)
         }
     }
 }
@@ -76,5 +77,5 @@ fun SeeMoreScreen(
 @Preview
 @Composable
 private fun SeeMoreScreenPreview() {
-    SeeMoreScreen(title = "Movies", listType = MovieListType.PopularMovies, onBack = {})
+    SeeMoreScreen(title = "Movies", listType = MovieListType.PopularMovies, navigateToDetails = {}, onBack = {})
 }

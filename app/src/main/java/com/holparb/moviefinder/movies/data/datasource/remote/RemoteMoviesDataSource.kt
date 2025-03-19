@@ -2,8 +2,8 @@ package com.holparb.moviefinder.movies.data.datasource.remote
 
 import com.holparb.moviefinder.core.data.networking.constructUrl
 import com.holparb.moviefinder.core.data.networking.safeCall
-import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.Result
+import com.holparb.moviefinder.core.domain.util.errors.NetworkError
 import com.holparb.moviefinder.core.domain.util.map
 import com.holparb.moviefinder.movies.data.dto.MovieDetailsDto
 import com.holparb.moviefinder.movies.data.dto.MovieListItemDto
@@ -42,6 +42,20 @@ class RemoteMoviesDataSource @Inject constructor(
     ): Result<MovieDetailsDto, NetworkError> {
         return safeCall<MovieDetailsDto> {
             httpClient.get(constructUrl("/movie/$movieId"))
+        }
+    }
+
+    suspend fun getWatchlist(
+        sessionId: String,
+        page: Int = 1
+    ): Result<List<MovieListItemDto>, NetworkError> {
+        return safeCall<MovieListResponseDto> {
+            httpClient.get(urlString = constructUrl("/account/account_id/watchlist/movies")) {
+                parameter("session_id", sessionId)
+                parameter("page", page)
+            }
+        }.map {
+            it.results
         }
     }
 

@@ -1,4 +1,4 @@
-package com.holparb.moviefinder.movies.presentation.see_more.components
+package com.holparb.moviefinder.movies.presentation.see_more_screen.components
 
 import android.util.Log
 import android.widget.Toast
@@ -24,6 +24,7 @@ import com.holparb.moviefinder.movies.domain.model.Movie
 @Composable
 fun MovieVerticalList(
     movies: LazyPagingItems<Movie>,
+    navigateToDetails: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -61,7 +62,8 @@ fun MovieVerticalList(
                     movies[index]?.let { movie ->
                         MovieVerticalListItem(
                             modifier = Modifier.height(200.dp),
-                            movieVerticalListItemUi = movie.toMovieVerticalListItemUi()
+                            movieVerticalListItemUi = movie.toMovieVerticalListItemUi(),
+                            navigateToDetails = navigateToDetails
                         )
                     }
                 }

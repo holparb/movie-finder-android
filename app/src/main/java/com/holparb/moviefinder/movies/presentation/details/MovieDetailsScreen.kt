@@ -17,6 +17,7 @@ import com.holparb.moviefinder.movies.presentation.details.components.MovieDetai
 
 @Composable
 fun MovieDetailsScreen(
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val movieDetailsViewModel = hiltViewModel<MovieDetailsViewModel>()
@@ -38,6 +39,8 @@ fun MovieDetailsScreen(
     ) { paddingValues ->
         MovieDetailsDisplay(
             movieDetailsUi = state.movieDetailsUi,
+            onBack = onBack,
+            toggleWatchlist = movieDetailsViewModel::toggleWatchlist,
             modifier = Modifier.padding(paddingValues)
         )
     }
