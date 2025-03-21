@@ -46,52 +46,62 @@ fun MainMovieItem(
                 onNavigateToMovieDetails(state.movieList.first().id)
             }
     ) {
-        state.movieList.first().let { mainItem ->
-            SubcomposeAsyncImage(
-                model = mainItem.backdropPath,
-                error = {
-                    val resId = if(LocalInspectionMode.current) {
-                        R.drawable.test_backdrop_path
-                    } else {
-                        R.drawable.backdrop_path_error
-                    }
-                    Image(
-                        painter = painterResource(id = resId),
-                        contentDescription = null
+        if(state.movieList.isNotEmpty()) {
+            state.movieList.first().let { mainItem ->
+                SubcomposeAsyncImage(
+                    model = mainItem.backdropPath,
+                    error = {
+                        val resId = if(LocalInspectionMode.current) {
+                            R.drawable.test_backdrop_path
+                        } else {
+                            R.drawable.backdrop_path_error
+                        }
+                        Image(
+                            painter = painterResource(id = resId),
+                            contentDescription = null
+                        )
+                    },
+                    loading = { CircularProgressIndicator() },
+                    contentDescription = "movie poster",
+                    contentScale = ContentScale.FillHeight,
+                    modifier = modifier
+                        .fillMaxSize()
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, Color.Black),
+                                startY = 500f
+                            )
+                        )
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.BottomStart)
+                ) {
+                    Text(
+                        text = mainItem.title ,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
-                },
-                loading = { CircularProgressIndicator() },
-                contentDescription = "movie poster",
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = if(mainItem.releaseDate != null) mainItem.releaseDate.format(
+                            DateTimeFormatter.ofPattern("MMM dd, yyyy")) else "",
+                    )
+                }
+            }
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.backdrop_path_error),
+                contentDescription = null,
                 contentScale = ContentScale.FillHeight,
                 modifier = modifier
                     .fillMaxSize()
             )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black),
-                            startY = 500f
-                        )
-                    )
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.BottomStart)
-            ) {
-                Text(
-                    text = mainItem.title ,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = if(mainItem.releaseDate != null) mainItem.releaseDate.format(
-                        DateTimeFormatter.ofPattern("MMM dd, yyyy")) else "",
-                )
-            }
         }
     }
 }
