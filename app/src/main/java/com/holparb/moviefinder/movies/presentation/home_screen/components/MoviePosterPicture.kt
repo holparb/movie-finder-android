@@ -1,17 +1,20 @@
 package com.holparb.moviefinder.movies.presentation.home_screen.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.holparb.moviefinder.R
+import com.holparb.moviefinder.core.presentation.components.LoadingShimmerEffect
 import com.holparb.moviefinder.ui.theme.Shapes
 
 @Composable
@@ -26,6 +29,11 @@ fun MoviePosterPicture(
             Image(
                 painter = painterResource(id = R.drawable.poster_not_found),
                 contentDescription = "poster placeholder"
+            )
+        },
+        loading = {
+            LoadingShimmerEffect(
+                modifier = modifier.clip(Shapes.medium).background(Color.LightGray)
             )
         },
         modifier = modifier

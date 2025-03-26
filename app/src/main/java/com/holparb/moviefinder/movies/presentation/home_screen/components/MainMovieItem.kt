@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.holparb.moviefinder.R
+import com.holparb.moviefinder.core.presentation.components.LoadingShimmerEffect
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
@@ -60,10 +61,14 @@ fun MainMovieItem(
                             contentDescription = null
                         )
                     },
+                    loading = {
+                        LoadingShimmerEffect(
+                            modifier = modifier.fillMaxSize().background(Color.LightGray)
+                        )
+                    },
                     contentDescription = "movie poster",
                     contentScale = ContentScale.FillHeight,
-                    modifier = modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 )
                 Box(
                     modifier = Modifier
