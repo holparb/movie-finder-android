@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,12 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.holparb.moviefinder.R
+import com.holparb.moviefinder.core.presentation.components.LoadingShimmerEffect
 import com.holparb.moviefinder.movies.domain.model.MovieListType
 import com.holparb.moviefinder.movies.presentation.home_screen.MovieListState
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
@@ -46,23 +46,29 @@ fun MainMovieItem(
                 onNavigateToMovieDetails(state.movieList.first().id)
             }
     ) {
-        if(state.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .width(64.dp)
-                    .align(Alignment.Center),
-                color = MaterialTheme.colorScheme.onBackground,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-        }
-        else if (state.movieList.isNotEmpty()){
+        if(state.movieList.isNotEmpty()) {
             state.movieList.first().let { mainItem ->
                 SubcomposeAsyncImage(
                     model = mainItem.backdropPath,
+                    error = {
+                        val resId = if(LocalInspectionMode.current) {
+                            R.drawable.test_backdrop_path
+                        } else {
+                            R.drawable.backdrop_path_error
+                        }
+                        Image(
+                            painter = painterResource(id = resId),
+                            contentDescription = null
+                        )
+                    },
+                    loading = {
+                        LoadingShimmerEffect(
+                            modifier = modifier.fillMaxSize().background(Color.LightGray)
+                        )
+                    },
                     contentDescription = "movie poster",
                     contentScale = ContentScale.FillHeight,
-                    modifier = modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 )
                 Box(
                     modifier = Modifier

@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.holparb.moviefinder.R
+import com.holparb.moviefinder.core.presentation.components.LoadingShimmerEffect
 import com.holparb.moviefinder.movies.domain.model.Genre
 import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.movies.presentation.details.MovieDetailsUi
@@ -64,6 +65,11 @@ fun MovieDetailsHeader(
                 Image(
                     painter = painterResource(id = resId),
                     contentDescription = null
+                )
+            },
+            loading = {
+                LoadingShimmerEffect(
+                    modifier = Modifier.fillMaxSize().background(Color.LightGray)
                 )
             },
             contentDescription = "Movie backdrop path",
