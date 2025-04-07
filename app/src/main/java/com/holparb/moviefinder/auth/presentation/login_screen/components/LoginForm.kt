@@ -28,6 +28,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.holparb.moviefinder.R
 import com.holparb.moviefinder.auth.presentation.login_screen.LoginFormEvent
@@ -36,7 +37,9 @@ import com.holparb.moviefinder.auth.presentation.login_screen.LoginScreenState
 import com.holparb.moviefinder.core.domain.util.errors.LoginError
 import com.holparb.moviefinder.core.presentation.util.ObserveAsEvents
 import com.holparb.moviefinder.core.presentation.util.toString
+import com.holparb.moviefinder.ui.theme.MovieFinderTheme
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun LoginForm(
@@ -133,5 +136,13 @@ fun LoginForm(
                 Text(text = "Login")
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginFormPreview() {
+    MovieFinderTheme {
+        LoginForm(state = LoginScreenState(), events = emptyFlow(), onEvent = {}, navigateToWatchlist = {})
     }
 }
