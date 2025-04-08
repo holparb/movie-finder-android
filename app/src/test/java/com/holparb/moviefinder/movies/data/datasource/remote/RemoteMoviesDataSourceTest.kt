@@ -95,4 +95,20 @@ class RemoteMoviesDataSourceTest {
         Assert.assertTrue(response is Result.Error)
         Assert.assertEquals(NetworkError.SERVER_ERROR, (response as Result.Error).error)
     }
+
+    @Test
+    fun search_is_successful() = runBlocking {
+        givenSuccess()
+        val response = remoteMoviesDataSource.search(query = "search text")
+        Assert.assertTrue(response is Result.Success)
+        Assert.assertEquals(20, (response as Result.Success).data.size)
+    }
+
+    @Test
+    fun search_fails_with_server_error() = runBlocking {
+        givenFailure()
+        val response = remoteMoviesDataSource.search("search text")
+        Assert.assertTrue(response is Result.Error)
+        Assert.assertEquals(NetworkError.SERVER_ERROR, (response as Result.Error).error)
+    }
 }

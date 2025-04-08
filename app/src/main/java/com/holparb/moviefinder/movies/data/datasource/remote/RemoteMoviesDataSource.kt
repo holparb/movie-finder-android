@@ -59,6 +59,20 @@ class RemoteMoviesDataSource @Inject constructor(
         }
     }
 
+    suspend fun search(
+        query: String,
+        page: Int = 1
+    ): Result<List<MovieListItemDto>, NetworkError> {
+        return safeCall<MovieListResponseDto> {
+            httpClient.get(urlString = constructUrl("/search/movie")) {
+                parameter("query", query)
+                parameter("page", page)
+            }
+        }.map {
+            it.results
+        }
+    }
+
     companion object {
         const val IMAGE_URL_W500: String = "https://image.tmdb.org/t/p/w500"
         const val IMAGE_URL_W780: String = "https://image.tmdb.org/t/p/w780"
