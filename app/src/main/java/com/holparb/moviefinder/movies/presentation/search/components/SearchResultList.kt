@@ -24,7 +24,8 @@ fun SearchResultList(
         modifier = modifier.fillMaxSize(),
         columns = GridCells.Adaptive(minSize = 100.dp)
     ) {
-        items(movies, key = { it.id }) { movie ->
+        items(movies) { movie ->
+            println(movie)
             MoviePosterPicture(
                 posterPath = movie.posterPath,
                 modifier = Modifier
