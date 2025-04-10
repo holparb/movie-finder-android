@@ -1,6 +1,5 @@
 package com.holparb.moviefinder.movies.presentation.search.components
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -21,11 +20,9 @@ fun SearchResultList(
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
-        modifier = modifier.fillMaxSize(),
         columns = GridCells.Adaptive(minSize = 100.dp)
     ) {
         items(movies) { movie ->
-            println(movie)
             MoviePosterPicture(
                 posterPath = movie.posterPath,
                 modifier = Modifier

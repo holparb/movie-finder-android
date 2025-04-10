@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -18,7 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
 
 @Composable
-fun SearchText(modifier: Modifier = Modifier) {
+fun SearchText(
+    text: String,
+    onSearchTextUpdate: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val focusManager = LocalFocusManager.current
 
     OutlinedTextField(
@@ -36,8 +41,9 @@ fun SearchText(modifier: Modifier = Modifier) {
                 )
             )
         },
-        value = "Search",
-        onValueChange = {},
+        value = text,
+        placeholder = { Text("Search") },
+        onValueChange = { onSearchTextUpdate(it) },
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done
@@ -54,6 +60,6 @@ fun SearchText(modifier: Modifier = Modifier) {
 @Composable
 private fun SearchTextPreview() {
     MovieFinderTheme {
-        SearchText()
+        SearchText(text = "Search", onSearchTextUpdate = {})
     }
 }
