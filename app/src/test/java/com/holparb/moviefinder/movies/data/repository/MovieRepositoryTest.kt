@@ -155,4 +155,25 @@ class MovieRepositoryTest {
         Assert.assertTrue(result is Result.Error)
         Assert.assertTrue((result as Result.Error).error == DataError.Network(networkError))
     }
+
+    @Test
+    fun search_returns_successfully() = runBlocking {
+        coEvery { dataSource.search(any<String>(), any<Int>()) } returns Result.Success(movieListDtos)
+
+        val result = repository.search("searchText")
+
+        Assert.assertTrue(result is Result.Success)
+        Assert.assertEquals(movieListDtos.map { it.toMovie() }, (result as Result.Success).data)
+    }
+
+    @Test
+    fun search_returns_with_error_in_case_of_network_error() = runBlocking {
+        val networkError = NetworkError.SERVER_ERROR
+        coEvery { dataSource.search(any<String>(), any<Int>()) } returns Result.Error(networkError)
+
+        val result = repository.search("searchText")
+
+        Assert.assertTrue(result is Result.Error)
+        Assert.assertTrue((result as Result.Error).error == DataError.Network(networkError))
+    }
 }
