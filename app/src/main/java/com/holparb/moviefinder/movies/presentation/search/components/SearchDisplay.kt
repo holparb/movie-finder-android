@@ -7,21 +7,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.holparb.moviefinder.movies.presentation.search.SearchAction
 import com.holparb.moviefinder.movies.presentation.search.SearchState
 
 @Composable
 fun SearchDisplay(
     state: SearchState,
     searchText: String,
-    onSearchTextUpdate: (String) -> Unit,
+    onAction: (SearchAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        SearchText(text = searchText, onSearchTextUpdate = onSearchTextUpdate)
+        SearchText(text = searchText, onAction = onAction)
         Spacer(Modifier.height(16.dp))
-        SearchResultList(movies = state.movies)
+        SearchResultList(state = state, onAction = onAction)
         Spacer(Modifier.height(32.dp))
     }
 }

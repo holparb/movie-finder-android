@@ -18,7 +18,7 @@ fun SearchScreen() {
     SearchDisplay(
         state = state,
         searchText = searchText,
-        onSearchTextUpdate = searchViewModel::updateSearchText,
+        onAction = searchViewModel::onAction,
         modifier = Modifier.padding(16.dp)
     )
 }

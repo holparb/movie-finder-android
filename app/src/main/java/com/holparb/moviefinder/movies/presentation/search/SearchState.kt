@@ -4,5 +4,6 @@ import com.holparb.moviefinder.movies.domain.model.Movie
 
 data class SearchState(
     val movies: List<Movie> = emptyList(),
-    val isLoading: Boolean = false
+    val isNewPageLoading: Boolean = false,
+    val isLastPageReached: Boolean = false
 )

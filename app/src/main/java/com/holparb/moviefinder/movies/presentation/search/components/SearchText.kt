@@ -16,12 +16,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import com.holparb.moviefinder.movies.presentation.search.SearchAction
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
 
 @Composable
 fun SearchText(
     text: String,
-    onSearchTextUpdate: (String) -> Unit,
+    onAction: (SearchAction.UpdateSearchText) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
@@ -43,7 +44,7 @@ fun SearchText(
         },
         value = text,
         placeholder = { Text("Search") },
-        onValueChange = { onSearchTextUpdate(it) },
+        onValueChange = { onAction(SearchAction.UpdateSearchText(it)) },
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done
@@ -60,6 +61,6 @@ fun SearchText(
 @Composable
 private fun SearchTextPreview() {
     MovieFinderTheme {
-        SearchText(text = "Search", onSearchTextUpdate = {})
+        SearchText(text = "Search", onAction = {})
     }
 }
