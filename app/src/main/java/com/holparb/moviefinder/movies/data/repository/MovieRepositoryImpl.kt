@@ -48,13 +48,8 @@ class MovieRepositoryImpl @Inject constructor (
             page = page,
             region = region
         ).map {
-            it.forEach { dto ->
-                println(dto)
-            }
             it.map { movieListItemDto ->
-                println("Handling dto: $movieListItemDto")
                 val movieEntity = movieDao.getMovieById(movieListItemDto.id) ?: movieListItemDto.toMovieEntity()
-                println("Found entity: $movieEntity")
                 val movieEntityToAdd = when(movieListType) {
                     MovieListType.PopularMovies -> movieEntity.copy(isPopular = true)
                     MovieListType.TopRatedMovies -> movieEntity.copy(isTopRated = true)
@@ -128,9 +123,6 @@ class MovieRepositoryImpl @Inject constructor (
         return try {
             val movies = movieDao.getWatchlist((page - 1) * 20).map {
                 it.toMovie()
-            }
-            movies.forEach {
-                println(it)
             }
             Result.Success(movies)
         } catch (e: Exception) {
@@ -212,5 +204,22 @@ class MovieRepositoryImpl @Inject constructor (
             page = page,
             region = region
         )
+    }
+
+    override suspend fun search(
+        query: String,
+        page: Int
+    ): Result<List<Movie>, DataError.Network> {
+        val result = moviesDataSource.search(query = query, page = page)
+            .map { movieListItemDtos ->
+                movieListItemDtos.map {
+                    it.toMovie()
+                }
+            }
+
+        return when(result) {
+            is Result.Error -> Result.Error(DataError.Network(result.error))
+            is Result.Success -> Result.Success(result.data)
+        }
     }
 }

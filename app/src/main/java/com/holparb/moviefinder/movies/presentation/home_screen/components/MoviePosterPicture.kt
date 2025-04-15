@@ -22,24 +22,35 @@ fun MoviePosterPicture(
     posterPath: String?,
     modifier: Modifier = Modifier
 ) {
-    SubcomposeAsyncImage(
-        model = posterPath,
-        contentDescription = "movie poster",
-        error = {
-            Image(
-                painter = painterResource(id = R.drawable.poster_not_found),
-                contentDescription = "poster placeholder"
-            )
-        },
-        loading = {
-            LoadingShimmerEffect(
-                modifier = modifier.clip(Shapes.medium).background(Color.LightGray)
-            )
-        },
-        modifier = modifier
-            .clip(Shapes.medium)
-            .aspectRatio(2f / 3f)
-    )
+    if(posterPath != null) {
+        SubcomposeAsyncImage(
+            model = posterPath,
+            contentDescription = "movie poster",
+            error = {
+                Image(
+                    painter = painterResource(id = R.drawable.poster_not_found),
+                    contentDescription = "poster placeholder"
+                )
+            },
+            loading = {
+                LoadingShimmerEffect(
+                    modifier = modifier.clip(Shapes.medium).background(Color.LightGray)
+                )
+            },
+            modifier = modifier
+                .clip(Shapes.medium)
+                .aspectRatio(2f / 3f)
+        )
+    } else {
+        Image(
+            painter = painterResource(id = R.drawable.poster_not_found),
+            contentDescription = "poster placeholder",
+            modifier = modifier
+                .clip(Shapes.medium)
+                .aspectRatio(2f / 3f)
+        )
+    }
+
 }
 
 @Preview
