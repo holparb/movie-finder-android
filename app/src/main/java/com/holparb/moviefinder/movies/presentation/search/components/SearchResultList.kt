@@ -20,15 +20,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.holparb.moviefinder.core.presentation.util.ObserveAsEvents
 import com.holparb.moviefinder.movies.presentation.details.components.previewMovie
 import com.holparb.moviefinder.movies.presentation.home_screen.components.MoviePosterPicture
 import com.holparb.moviefinder.movies.presentation.search.SearchAction
+import com.holparb.moviefinder.movies.presentation.search.SearchEvent
 import com.holparb.moviefinder.movies.presentation.search.SearchState
 import com.holparb.moviefinder.ui.theme.MovieFinderTheme
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun SearchResultList(
     state: SearchState,
+    events: Flow<SearchEvent>,
     onAction: (SearchAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -46,9 +51,17 @@ fun SearchResultList(
         }
     }
 
+    ObserveAsEvents(events) { event ->
+        when(event) {
+            is SearchEvent.searchError -> {
+
+            }
+        }
+    }
+
     LazyVerticalGrid(
         state = gridState,
-        columns = GridCells.Adaptive(120.dp),
+        columns = GridCells.Adaptive(110.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.fillMaxSize()
@@ -61,7 +74,9 @@ fun SearchResultList(
         if(state.isNewPageLoading) {
             item {
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(
@@ -85,6 +100,7 @@ private fun SearchResultListPreview() {
                 previewMovie,
                 previewMovie
             )),
+            events = emptyFlow(),
            onAction = {}
         )
     }

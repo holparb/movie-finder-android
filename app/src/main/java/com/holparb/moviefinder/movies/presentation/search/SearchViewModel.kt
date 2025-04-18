@@ -7,6 +7,7 @@ import com.holparb.moviefinder.di.MovieListPaginatorFactory
 import com.holparb.moviefinder.movies.domain.repository.MovieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -66,6 +68,9 @@ class SearchViewModel @Inject constructor(
                 .filter { it.isNotBlank() }
                 .distinctUntilChanged()
                 .collectLatest { queryText ->
+                    _state.update {
+                        it.copy(movies = emptyList())
+                    }
                     movieListPaginator.reset()
                     movieListPaginator.loadNextPage()
                 }
@@ -76,8 +81,16 @@ class SearchViewModel @Inject constructor(
         ""
     )
 
+    private val _events = Channel<SearchEvent>()
+    val events = _events.receiveAsFlow()
+
     private fun updateSearchText(text: String) {
        _searchText.update { text }
+        if(text.isBlank()) {
+            _state.update {
+                it.copy(movies = emptyList())
+            }
+        }
     }
 
     private fun loadMorePages() {

@@ -8,11 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.holparb.moviefinder.movies.presentation.search.SearchAction
+import com.holparb.moviefinder.movies.presentation.search.SearchEvent
 import com.holparb.moviefinder.movies.presentation.search.SearchState
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun SearchDisplay(
     state: SearchState,
+    events: Flow<SearchEvent>,
     searchText: String,
     onAction: (SearchAction) -> Unit,
     modifier: Modifier = Modifier
@@ -22,7 +25,7 @@ fun SearchDisplay(
     ) {
         SearchText(text = searchText, onAction = onAction)
         Spacer(Modifier.height(16.dp))
-        SearchResultList(state = state, onAction = onAction)
+        SearchResultList(state = state, onAction = onAction, events = events)
         Spacer(Modifier.height(32.dp))
     }
 }

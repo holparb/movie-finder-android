@@ -33,14 +33,19 @@ fun SearchText(
             Icon(imageVector = Icons.Default.Search, contentDescription = "search icon")
         },
         trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.Clear,
-                contentDescription = "clear icon",
-                modifier = Modifier.clickable(
-                    enabled = false,
-                    onClick = {}
+            if(text.isNotBlank()) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "clear icon",
+                    modifier = Modifier.clickable(
+                        enabled = true,
+                        onClick = {
+                            println("Clear search")
+                            onAction(SearchAction.UpdateSearchText(""))
+                        }
+                    )
                 )
-            )
+            }
         },
         value = text,
         placeholder = { Text("Search") },
