@@ -1,5 +1,7 @@
 package com.holparb.moviefinder.movies.presentation.see_more_screen.components
 
+import com.holparb.moviefinder.core.presentation.util.DisplayableNumber
+import com.holparb.moviefinder.core.presentation.util.toDisplayableNumber
 import com.holparb.moviefinder.movies.domain.model.Movie
 import java.time.format.DateTimeFormatter
 
@@ -8,7 +10,7 @@ data class MovieVerticalListItemUi(
     val title: String = "",
     val releaseYear: String = "",
     val posterPath: String? = null,
-    val rating: String = "No rating available",
+    val rating: DisplayableNumber? = null,
     val overview: String = ""
 )
 
@@ -18,7 +20,7 @@ fun Movie.toMovieVerticalListItemUi(): MovieVerticalListItemUi {
         title = title,
         overview = overview,
         posterPath = posterPath,
-        rating = rating?.toString() ?: "No rating available",
+        rating = rating?.toDisplayableNumber(),
         releaseYear = releaseDate?.format(DateTimeFormatter.ofPattern("yyyy")) ?: ""
     )
 }

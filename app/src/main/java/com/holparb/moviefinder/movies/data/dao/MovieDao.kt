@@ -23,13 +23,13 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE is_popular ORDER BY release_date DESC LIMIT 20")
     suspend fun getPopularMoviesForHomeScreen(): List<MovieEntity>
 
-    @Query("SELECT * FROM movies WHERE is_popular ORDER BY popularity DESC")
+    @Query("SELECT * FROM movies WHERE is_popular ORDER BY popularity DESC, release_date DESC")
     fun getPopularMoviesWithPagination():PagingSource<Int, MovieEntity>
 
     @Query("SELECT * FROM movies WHERE is_top_rated ORDER BY rating DESC")
     fun getTopRatedMoviesWithPagination(): PagingSource<Int, MovieEntity>
 
-    @Query("SELECT * FROM movies WHERE is_upcoming")
+    @Query("SELECT * FROM movies WHERE is_upcoming ORDER BY release_date DESC")
     fun getUpcomingMoviesWithPagination(): PagingSource<Int, MovieEntity>
 
     @Query("SELECT * FROM movies WHERE is_watchlist ORDER BY watchlist_page ASC, id ASC LIMIT 20 OFFSET :offset")

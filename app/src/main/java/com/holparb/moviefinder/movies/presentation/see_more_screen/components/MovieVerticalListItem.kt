@@ -18,10 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.holparb.moviefinder.R
 import com.holparb.moviefinder.movies.domain.model.Movie
 import com.holparb.moviefinder.movies.presentation.home_screen.components.MoviePosterPicture
 import java.time.LocalDate
@@ -63,7 +65,7 @@ fun MovieVerticalListItem(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = movieVerticalListItemUi.rating,
+                        text = movieVerticalListItemUi.rating?.formattedValue ?: stringResource(R.string.no_rating),
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                     )
                 }
